@@ -1,0 +1,79 @@
+.register-card {
+  background: var(--bg-card); /* Blanco puro */
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  max-width: 600px;
+  margin: 2rem auto;
+  border: 1px solid #f1f5f9;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.register-header h2 {
+  color: var(--primary-blue); /* Azul Zafiro */
+  margin: 0;
+}
+
+.register-header p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.register-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.reg-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.reg-group.full-width {
+  grid-column: span 2;
+}
+
+.reg-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-main);
+}
+
+.reg-group input, .reg-select {
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  transition: all 0.3s;
+}
+
+.reg-group input:focus {
+  outline: none;
+  border-color: var(--secondary-teal); /* Turquesa al hacer foco */
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+.btn-register-now {
+  grid-column: span 2;
+  background-color: var(--primary-blue);
+  color: white;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
+  margin-top: 10px;
+}
+
+.btn-register-now:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+}

@@ -1,0 +1,74 @@
+/* Form.css - Estilo Limpio con Botón tipo Navbar */
+
+.universal-form-container {
+  background-color: var(--bg-card); /* Blanco puro */
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* Sombra suave */
+  border: 1px solid #F1F5F9;
+  max-width: 650px;
+  margin: 20px auto;
+}
+
+.form-header {
+  margin-bottom: 25px;
+  border-left: 4px solid var(--secondary-teal); /* Detalle Turquesa */
+  padding-left: 15px;
+}
+
+.form-header h3 {
+  color: var(--text-main);
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.grid-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.input-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-box.full-width {
+  grid-column: span 2;
+}
+
+.input-box label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.input-box input, 
+.form-select {
+  padding: 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #F9FAFB;
+  transition: all 0.3s;
+}
+
+.btn-form-submit {
+  grid-column: span 2;
+  background-color: var(--primary-blue);
+  color: white;
+  padding: 14px;
+  border-radius: 50px; /* Píldora */
+  border: none;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+  transition: all 0.3s ease;
+}
+
+.btn-form-submit:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+}

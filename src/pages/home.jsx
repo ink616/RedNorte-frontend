@@ -9,7 +9,7 @@ const Home = ({ isLoggedIn }) => {
       <header className="hero-container">
         <div className="hero-content">
           <div className="hero-text">
-            <h1>Atención Médica <br /><span>con Inteligencia Artificial</span></h1>
+            <h1>Atención Médica <br /></h1>
             <p>Tecnología de última generación para diagnósticos más certeros, en menos tiempo y al mismo precio.</p>
             <button className="btn-secondary">Más Información</button>
           </div>

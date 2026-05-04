@@ -1,0 +1,63 @@
+/* src/css/login.css */
+
+.login-screen {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-global); /* El gris claro que definimos */
+  padding: 20px;
+}
+
+.login-box {
+  background-color: var(--bg-card); /* Blanco puro */
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  border: 1px solid #E5E7EB;
+  text-align: center;
+}
+
+.login-header h2 {
+  color: var(--primary-blue); /* Azul Zafiro #2563EB */
+  margin-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-main);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  box-sizing: border-box; /* Evita que el input se salga del cuadro */
+}
+
+.btn-login-submit {
+  width: 100%;
+  background-color: var(--primary-blue);
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-login-submit:hover {
+  background-color: var(--primary-hover);
+}

@@ -1,0 +1,152 @@
+/* Navbar.css - ACTUALIZADO */
+
+/* 1. Contenedor Principal */
+.navbar {
+  background-color: var(--bg-card); /* Blanco puro */
+  border-bottom: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 5%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* 2. Logo con el Azul Zafiro solicitado */
+.navbar-logo a {
+  text-decoration: none;
+}
+
+.navbar-logo h1 {
+  color: #2563EB; /* Azul Zafiro */
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.navbar-logo h1 span {
+  color: #0D9488; /* Turquesa para el contraste */
+}
+
+/* 3. LINKS (Aquí estaba el error de colocación) */
+.navbar-links {
+  display: flex; /* Alinea los links horizontalmente */
+  list-style: none; /* Quita los puntos de la lista */
+  margin: 0;
+  padding: 0;
+  gap: 25px; /* Espacio entre links */
+}
+
+.navbar-links a {
+  color: var(--text-secondary); /* Gris medio */
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.navbar-links a:hover {
+  color: var(--primary-blue);
+}
+
+/* 4. BOTONES (Lado derecho) */
+.navbar-cta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* El botón que no se veía */
+.btn-login-text {
+  color: var(--primary-blue); /* Azul Zafiro para que sea visible */
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.3s;
+}
+
+.btn-login-text:hover {
+  opacity: 0.7;
+}
+
+/* Botón principal Pedir Cita */
+.btn-cita {
+  background-color: #2563EB; /* Azul Zafiro solicitado */
+  color: white !important;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+  transition: all 0.3s ease;
+}
+
+.btn-cita:hover {
+  background-color: #1D4ED8;
+  transform: translateY(-1px);
+}
+/* ... (estilos previos de navbar) */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+}
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Botón Principal Modal (Azul Píldora) */
+.btn-modal-login {
+  background-color: var(--primary-blue);
+  color: white;
+  padding: 12px;
+  border-radius: 50px; /* Estilo píldora */
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+  transition: all 0.3s ease;
+}
+
+/* Botón Secundario Modal (Borde Turquesa) */
+.btn-modal-register {
+  background-color: transparent;
+  color: var(--secondary-teal);
+  padding: 12px;
+  border-radius: 50px;
+  border: 2px solid var(--secondary-teal);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-modal-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  margin-top: 15px;
+  cursor: pointer;
+  text-decoration: underline;
+}
