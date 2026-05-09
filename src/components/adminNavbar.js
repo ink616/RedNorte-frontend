@@ -1,28 +1,36 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-const AdminNavbar = () => {
+const AdminNavbar = ({ setIsLoggedIn }) => {
+    const navigate = useNavigate();
     const logoSrc = "IMG/Adobe Express - file.png"; 
 
+    const handleLogout = () => {
+        setIsLoggedIn(false);
+        navigate('/login');
+    };
+
     return (
-        <header className="navbar">
+        <header className="navbar admin-navbar">
             <div className="logo">
-                <img src={logoSrc} alt="Logo de la Empresa" />
+                <Link to="/">
+                    <img src={logoSrc} alt="Logo RedNorte" />
+                </Link>
             </div>
+            
             <nav className="nav-links">
-                <a href="administrador.html">inicio</a>
+                <Link to="/">Inicio</Link>
                 <span>|</span>
-                <a href="crearUsuario.html">crear usuario</a>
+                <Link to="/admin/usuarios">Gestión de Usuarios</Link>
                 <span>|</span>
-                <a href="modificarUsuario.html">modificar usuario</a>
-                <span>|</span>
-                <a href="mostrarUsuario.html">mostrar usuarios</a>
-                <span>|</span>
-                <a href="crearProducto.html">crear producto</a>
-                <span>|</span>
-                <a href="modificarProducto.html">modificar producor</a>
-                <span>|</span>
-                <a href="mostrarProducto.html">moctrar producto</a>
+                <Link to="/admin/citas">Gestión de Citas</Link>
             </nav>
+
+            <div className="nav-auth">
+                <button onClick={handleLogout} className="btn-logout-admin">
+                    Cerrar Sesión Admin
+                </button>
+            </div>
         </header>
     );
 };

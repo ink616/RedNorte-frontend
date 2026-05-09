@@ -1,56 +1,47 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import '../css/navbar.css';
 
-const Navbar = ({ isLoggedIn }) => {
-  const [showModal, setShowModal] = useState(false);
+const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();
 
-  const handleCitaClick = (e) => {
-    if (!isLoggedIn) {
-      e.preventDefault();
-      setShowModal(true);
-    }
-  };
-
-  const goTo = (path) => {
-    setShowModal(false);
-    navigate(path);
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    navigate('/login');
   };
 
   return (
-    <>
-      <nav className="navbar">
-        <div className="navbar-logo">
-          <Link to="/"><h1>RED<span>NORTE</span></h1></Link>
-        </div>
-        <ul className="navbar-links">
-          <li><Link to="/">Inicio</Link></li>
-          <li><Link to="/nosotros">Nosotros</Link></li>
-        </ul>
-        <div className="navbar-cta">
-          {!isLoggedIn && <Link to="/login" className="btn-login-text">Entrar</Link>}
-          <Link to="/agendar" onClick={handleCitaClick} className="btn-cita">
-            Pedir Cita
-          </Link>
-        </div>
-      </nav>
+    <nav className="navbar">
+      <div className="navbar-logo">
+        <Link to="/">RedNorte</Link>
+      </div>
+      
+      <ul className="navbar-links">
+        <li><Link to="/">Inicio</Link></li>
+        <li><Link to="/nosotros">Nosotros</Link></li>
+        <li><Link to="/contacto">Contacto</Link></li>
 
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-icon">⚠️</div>
-            <h2>Acceso Restringido</h2>
-            <p>Para agendar una hora médica, primero debes ingresar a tu cuenta.</p>
-            <div className="modal-buttons">
-              <button onClick={() => goTo('/login')} className="btn-modal-login">Iniciar Sesión</button>
-              <button onClick={() => goTo('/registro')} className="btn-modal-register">Registrarse</button>
-            </div>
-            <button onClick={() => setShowModal(false)} className="btn-modal-close">Cerrar</button>
+        {isLoggedIn && (
+          <>
+            <li><Link to="/notificaciones">Notificaciones</Link></li>
+            <li><Link to="/reportes">Reportes</Link></li>
+            <li><Link to="/perfil">Perfil</Link></li>
+          </>
+        )}
+      </ul>
+
+      <div className="navbar-auth">
+        {isLoggedIn ? (
+          <button onClick={handleLogout} className="btn-logout">
+            Cerrar Sesión
+          </button>
+        ) : (
+          <div className="auth-buttons">
+            <Link to="/login" className="btn-login">Entrar</Link>
+            <Link to="/registro" className="btn-register">Registrarse</Link>
           </div>
-        </div>
-      )}
-    </>
+        )}
+      </div>
+    </nav>
   );
 };
 
