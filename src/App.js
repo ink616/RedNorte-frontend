@@ -1,49 +1,80 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
-// Componentes y Páginas
-import Navbar from './components/navbar'; 
-import Home from './pages/home';
-import Login from './pages/login';
-import Registro from './pages/registro';
-import Agendar from './pages/agendar';
-import Perfil from './pages/perfil';
-import Reportes from './pages/reportes';
-import UsuariosPage from './pages/UsuariosPage';
-import CitasPage from './pages/CitasPage';
+import Navbar        from './components/navbar';
+import Home          from './pages/home';
+import Login         from './pages/login';
+import MisConsultas  from './pages/MisConsultas';
+import NuevaConsulta from './pages/NuevaConsulta';
+import EditarConsulta from './pages/EditarConsulta';
+import AdminDashboard from './pages/AdminDashboard';
+import CitasPage     from './pages/CitasPage';
+import UsuariosPage  from './pages/UsuariosPage';
 
 import './css/css.css';
 import './App.css';
 
-const PrivateRoutes = ({ isLoggedIn }) => {
-  return isLoggedIn ? <Outlet /> : <Navigate to="/login" replace />;
+// Rutas protegidas — requieren estar logueado
+const RutaPrivada = () => {
+  const { usuario } = useAuth();
+  return usuario ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+// Rutas solo para admin
+const RutaAdmin = () => {
+  const { usuario, esAdmin } = useAuth();
+  if (!usuario) return <Navigate to="/login" replace />;
+  if (!esAdmin) return <Navigate to="/mis-consultas" replace />;
+  return <Outlet />;
+};
 
+// Ruta pública — si ya está logueado, redirige al inicio correspondiente
+const RutaPublica = ({ children }) => {
+  const { usuario, esAdmin } = useAuth();
+  if (usuario) return <Navigate to={esAdmin ? '/admin/dashboard' : '/mis-consultas'} replace />;
+  return children;
+};
+
+function AppRoutes() {
   return (
-    <Router>
-      <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
-
+    <>
+      <Navbar />
       <div className="main-content">
         <Routes>
-          <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
-          <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-          <Route path="/registro" element={<Registro />} />
+          {/* Públicas */}
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<RutaPublica><Login /></RutaPublica>} />
 
-          <Route element={<PrivateRoutes isLoggedIn={isLoggedIn} />}>
-            <Route path="/agendar" element={<Agendar />} />
-            <Route path="/perfil" element={<Perfil />} />
-            <Route path="/reportes" element={<Reportes />} />
-            <Route path="/admin/usuarios" element={<UsuariosPage />} />
-            <Route path="/admin/citas" element={<CitasPage />} />
+          {/* Paciente */}
+          <Route element={<RutaPrivada />}>
+            <Route path="/mis-consultas"       element={<MisConsultas />} />
+            <Route path="/nueva-consulta"      element={<NuevaConsulta />} />
+            <Route path="/editar-consulta/:id" element={<EditarConsulta />} />
           </Route>
 
-          <Route path="*" element={<div className="text-center p-20"><h2>404 - No Encontrado</h2></div>} />
+          {/* Admin */}
+          <Route element={<RutaAdmin />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/consultas" element={<CitasPage />} />
+            <Route path="/admin/citas"     element={<CitasPage />} />
+            <Route path="/admin/usuarios"  element={<UsuariosPage />} />
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
-    </Router>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
   );
 }
 
