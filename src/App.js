@@ -1,35 +1,34 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import './index.css';
 
-import Navbar        from './components/navbar';
-import Home          from './pages/home';
-import Login         from './pages/login';
-import MisConsultas  from './pages/MisConsultas';
-import NuevaConsulta from './pages/NuevaConsulta';
-import EditarConsulta from './pages/EditarConsulta';
-import AdminDashboard from './pages/AdminDashboard';
-import CitasPage     from './pages/CitasPage';
-import UsuariosPage  from './pages/UsuariosPage';
+import Navbar               from './components/Navbar';
+import HomePage             from './pages/HomePage';
+import LoginPage            from './pages/LoginPage';
+import RegistroPage         from './pages/RegistroPage';
+import MisConsultasPage     from './pages/MisConsultasPage';
+import NuevaConsultaPage    from './pages/NuevaConsultaPage';
+import EditarConsultaPage   from './pages/EditarConsultaPage';
+import PerfilPage           from './pages/PerfilPage';
+import AdminDashboard       from './pages/AdminDashboard';
+import AdminConsultasPage   from './pages/AdminConsultasPage';
+import AdminUsuariosPage    from './pages/AdminUsuariosPage';
+import AdminReasignacionPage from './pages/AdminReasignacionPage';
 
-import './css/css.css';
-import './App.css';
-
-// Rutas protegidas — requieren estar logueado
 const RutaPrivada = () => {
   const { usuario } = useAuth();
   return usuario ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
-// Rutas solo para admin
 const RutaAdmin = () => {
   const { usuario, esAdmin } = useAuth();
   if (!usuario) return <Navigate to="/login" replace />;
-  if (!esAdmin) return <Navigate to="/mis-consultas" replace />;
+  if (!esAdmin)  return <Navigate to="/mis-consultas" replace />;
   return <Outlet />;
 };
 
-// Ruta pública — si ya está logueado, redirige al inicio correspondiente
 const RutaPublica = ({ children }) => {
   const { usuario, esAdmin } = useAuth();
   if (usuario) return <Navigate to={esAdmin ? '/admin/dashboard' : '/mis-consultas'} replace />;
@@ -40,42 +39,39 @@ function AppRoutes() {
   return (
     <>
       <Navbar />
-      <div className="main-content">
-        <Routes>
-          {/* Públicas */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<RutaPublica><Login /></RutaPublica>} />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login"   element={<RutaPublica><LoginPage /></RutaPublica>} />
+        <Route path="/registro" element={<RutaPublica><RegistroPage /></RutaPublica>} />
 
-          {/* Paciente */}
-          <Route element={<RutaPrivada />}>
-            <Route path="/mis-consultas"       element={<MisConsultas />} />
-            <Route path="/nueva-consulta"      element={<NuevaConsulta />} />
-            <Route path="/editar-consulta/:id" element={<EditarConsulta />} />
-          </Route>
+        <Route element={<RutaPrivada />}>
+          <Route path="/mis-consultas"       element={<MisConsultasPage />} />
+          <Route path="/nueva-consulta"      element={<NuevaConsultaPage />} />
+          <Route path="/editar-consulta/:id" element={<EditarConsultaPage />} />
+          <Route path="/perfil"              element={<PerfilPage />} />
+        </Route>
 
-          {/* Admin */}
-          <Route element={<RutaAdmin />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/consultas" element={<CitasPage />} />
-            <Route path="/admin/citas"     element={<CitasPage />} />
-            <Route path="/admin/usuarios"  element={<UsuariosPage />} />
-          </Route>
+        <Route element={<RutaAdmin />}>
+          <Route path="/admin/dashboard"    element={<AdminDashboard />} />
+          <Route path="/admin/consultas"    element={<AdminConsultasPage />} />
+          <Route path="/admin/usuarios"     element={<AdminUsuariosPage />} />
+          <Route path="/admin/reasignacion" element={<AdminReasignacionPage />} />
+        </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </div>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </>
   );
 }
 
-function App() {
+export default function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
-
-export default App;

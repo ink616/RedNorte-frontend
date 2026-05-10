@@ -1,78 +1,88 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { listarTodasConsultas, listarUsuarios } from '../service/api';
-import '../css/Home.css';
 
-const AdminDashboard = () => {
+export default function AdminDashboard() {
   const [consultas, setConsultas] = useState([]);
-  const [usuarios, setUsuarios] = useState([]);
-  const [cargando, setCargando] = useState(true);
+  const [usuarios,  setUsuarios]  = useState([]);
+  const [loading, setLoading]     = useState(true);
 
   useEffect(() => {
     Promise.all([listarTodasConsultas(), listarUsuarios()])
       .then(([c, u]) => { setConsultas(c); setUsuarios(u); })
-      .finally(() => setCargando(false));
+      .finally(() => setLoading(false));
   }, []);
 
-  const contar = (estado) => consultas.filter(c => c.estado === estado).length;
+  const n = (estado) => consultas.filter(c => c.estado === estado).length;
+  const recientes = [...consultas].sort((a,b) => new Date(b.fechaCreacion) - new Date(a.fechaCreacion)).slice(0, 5);
 
   const stats = [
-    { label: 'Total consultas', valor: consultas.length, color: '#2563EB' },
-    { label: 'Pendientes',      valor: contar('PENDIENTE'),  color: '#d97706' },
-    { label: 'Agendadas',       valor: contar('AGENDADA'),   color: '#0D9488' },
-    { label: 'Atendidas',       valor: contar('ATENDIDA'),   color: '#059669' },
-    { label: 'Usuarios',        valor: usuarios.length,      color: '#7c3aed' },
+    { label: 'Total consultas', valor: consultas.length, color: 'var(--primary)', icon: '📋' },
+    { label: 'Pendientes',      valor: n('PENDIENTE'),   color: 'var(--warning)', icon: '⏳' },
+    { label: 'Agendadas',       valor: n('AGENDADA'),    color: 'var(--teal)',    icon: '📅' },
+    { label: 'Reasignadas',     valor: n('REASIGNADA'),  color: 'var(--success)', icon: '🔄' },
+    { label: 'Atendidas',       valor: n('ATENDIDA'),    color: '#059669',        icon: '✅' },
+    { label: 'Usuarios activos',valor: usuarios.filter(u => u.estado === 'ACTIVO').length, color: '#7C3AED', icon: '👥' },
   ];
 
   return (
-    <div className="home-page admin-home">
-      <header className="hero-container" style={{ paddingBottom: 40 }}>
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1>Panel de Control<br /><span style={{ color: '#0D9488' }}>Administrativo</span></h1>
-            <p>Gestión de consultas, usuarios y reasignación de citas médicas.</p>
-          </div>
-        </div>
-      </header>
+    <div className="page">
+      <h2 className="page-title">📊 Panel de control</h2>
 
-      <div style={{ padding: '0 5% 40px' }}>
-        {/* Tarjetas de estadísticas */}
-        {cargando ? (
-          <p style={{ color: '#6b7280' }}>Cargando estadísticas...</p>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px,1fr))', gap: 16, marginBottom: 32 }}>
+      {loading ? <div className="spinner">Cargando estadísticas...</div> : (
+        <>
+          {/* Stats */}
+          <div className="grid-3" style={{ marginBottom: 28 }}>
             {stats.map(s => (
-              <div key={s.label} style={{ background: '#fff', borderRadius: 16, padding: 24, textAlign: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderTop: `4px solid ${s.color}` }}>
-                <div style={{ fontSize: 36, fontWeight: 700, color: s.color }}>{s.valor}</div>
-                <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>{s.label}</div>
+              <div key={s.label} className="stat-card" style={{ borderTopColor: s.color }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>{s.icon}</div>
+                <div className="stat-num" style={{ color: s.color }}>{s.valor}</div>
+                <div className="stat-label">{s.label}</div>
               </div>
             ))}
           </div>
-        )}
 
-        {/* Accesos rápidos */}
-        <section className="shortcuts-container" style={{ padding: 0, marginTop: 0 }}>
-          <div className="shortcuts-grid">
-            <Link to="/admin/consultas" className="shortcut-card highlight">
-              <div className="shortcut-icon">📋</div>
-              <h3>Gestión de consultas</h3>
-              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, marginTop: 4 }}>Ver y editar todas las consultas</p>
-            </Link>
-            <Link to="/admin/usuarios" className="shortcut-card">
-              <div className="shortcut-icon">👥</div>
-              <h3>Gestión de usuarios</h3>
-              <p style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>Administrar cuentas</p>
-            </Link>
-            <Link to="/admin/citas" className="shortcut-card">
-              <div className="shortcut-icon">📅</div>
-              <h3>Reasignación de citas</h3>
-              <p style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>Cancelar y reasignar bloques</p>
-            </Link>
+          {/* Accesos rápidos */}
+          <div className="grid-4" style={{ marginBottom: 28 }}>
+            <Link to="/admin/consultas"    className="shortcut-card highlight"><span className="icon">📋</span><h3>Consultas</h3><p>Gestionar todas</p></Link>
+            <Link to="/admin/usuarios"     className="shortcut-card"><span className="icon">👥</span><h3>Usuarios</h3><p>Administrar cuentas</p></Link>
+            <Link to="/admin/reasignacion" className="shortcut-card"><span className="icon">🔄</span><h3>Reasignación</h3><p>Cancelar y reasignar</p></Link>
+            <div className="shortcut-card" style={{ cursor: 'default' }}>
+              <span className="icon">📈</span>
+              <h3>{Math.round((n('ATENDIDA') / (consultas.length || 1)) * 100)}%</h3>
+              <p>Tasa de atención</p>
+            </div>
           </div>
-        </section>
-      </div>
+
+          {/* Últimas consultas */}
+          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 700, fontSize: 15 }}>
+              🕐 Últimas consultas ingresadas
+            </div>
+            <table className="tabla">
+              <thead><tr><th>N°</th><th>Paciente</th><th>Especialidad</th><th>Estado</th><th>Fecha</th></tr></thead>
+              <tbody>
+                {recientes.map(c => (
+                  <tr key={c.id}>
+                    <td><strong>#{c.id}</strong></td>
+                    <td>{c.nombrePaciente || '—'}</td>
+                    <td style={{ textTransform: 'capitalize' }}>{c.especialidad}</td>
+                    <td>
+                      <span className={`badge badge-${c.estado?.toLowerCase()}`}>{c.estado}</span>
+                    </td>
+                    <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                      {c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleDateString('es-CL') : '—'}
+                    </td>
+                  </tr>
+                ))}
+                {recientes.length === 0 && (
+                  <tr><td colSpan={5} style={{ textAlign: 'center', padding: 32, color: 'var(--text-muted)' }}>Sin consultas aún.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
-};
-
-export default AdminDashboard;
+}

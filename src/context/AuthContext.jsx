@@ -4,8 +4,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(() => {
-    const saved = localStorage.getItem('rednorte_usuario');
-    return saved ? JSON.parse(saved) : null;
+    try { return JSON.parse(localStorage.getItem('rednorte_usuario')); } catch { return null; }
   });
 
   const iniciarSesion = (u) => {
@@ -27,6 +26,4 @@ export function AuthProvider({ children }) {
   );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export function useAuth() { return useContext(AuthContext); }
