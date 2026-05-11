@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
 export default function Navbar() {
-  const { usuario, cerrarSesion, esAdmin } = useAuth();
+  const { usuario, cerrarSesion, esAdmin, esDoctor } = useAuth();
   const { darkMode, toggleDark } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,6 +24,13 @@ export default function Navbar() {
     whiteSpace: 'nowrap',
   });
 
+  const p = usuario?.persona;
+  const iniciales = p
+    ? (p.apellido1?.[0] || '') + (p.apellido2?.[0] || '')
+    : usuario?.mail?.[0]?.toUpperCase() || '?';
+
+  const rolColor = esAdmin ? '#EF4444' : esDoctor ? '#10B981' : '#2563EB';
+
   return (
     <nav style={{
       background: 'linear-gradient(90deg, #0f172a 0%, #1e3a8a 60%, #0f766e 100%)',
@@ -38,7 +45,7 @@ export default function Navbar() {
       zIndex: 500,
     }}>
 
-      {/* Logo más grande */}
+      {/* Logo */}
       <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', flexShrink: 0 }}>
         <img src="/logo.png" alt="RedNorte" style={{ height: 56, width: 'auto' }} />
         <div style={{ lineHeight: 1.2 }}>
@@ -51,7 +58,7 @@ export default function Navbar() {
         </div>
       </Link>
 
-      {/* Links */}
+      {/* Links según rol */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         {!usuario && (
           <>
@@ -60,7 +67,7 @@ export default function Navbar() {
             <Link to="/registro" style={linkStyle('/registro')}>Registrarse</Link>
           </>
         )}
-        {usuario && !esAdmin && (
+        {usuario && !esAdmin && !esDoctor && (
           <>
             <Link to="/inicio" style={linkStyle('/inicio')}>Inicio</Link>
             <Link to="/mis-consultas" style={linkStyle('/mis-consultas')}>Mis Consultas</Link>
@@ -69,13 +76,21 @@ export default function Navbar() {
             <Link to="/sobre-nosotros" style={linkStyle('/sobre-nosotros')}>Nosotros</Link>
           </>
         )}
-        {usuario && esAdmin && (
+        {esDoctor && (
+          <>
+            <Link to="/doctor/dashboard" style={linkStyle('/doctor/dashboard')}>Mis Pacientes</Link>
+            <Link to="/doctor/perfil" style={linkStyle('/doctor/perfil')}>Mi Perfil</Link>
+            <Link to="/sobre-nosotros" style={linkStyle('/sobre-nosotros')}>Nosotros</Link>
+          </>
+        )}
+        {esAdmin && (
           <>
             <Link to="/inicio" style={linkStyle('/inicio')}>Inicio</Link>
             <Link to="/admin/dashboard" style={linkStyle('/admin/dashboard')}>Dashboard</Link>
             <Link to="/admin/consultas" style={linkStyle('/admin/consultas')}>Consultas</Link>
             <Link to="/admin/usuarios" style={linkStyle('/admin/usuarios')}>Usuarios</Link>
             <Link to="/admin/reasignacion" style={linkStyle('/admin/reasignacion')}>Reasignación</Link>
+            <Link to="/sobre-nosotros" style={linkStyle('/sobre-nosotros')}>Nosotros</Link>
           </>
         )}
       </div>
@@ -91,9 +106,14 @@ export default function Navbar() {
         </button>
         {usuario ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 14, fontWeight: 700 }}>
-              {usuario.mail?.[0]?.toUpperCase()}
-            </div>
+            <div style={{
+              width: 38, height: 38, borderRadius: '50%',
+              background: rolColor,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'white', fontSize: 14, fontWeight: 700,
+              border: '2px solid rgba(255,255,255,0.3)',
+              title: usuario?.rol?.nombre,
+            }}>{iniciales}</div>
             <button onClick={handleSalir} style={{
               background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)',
               borderRadius: 20, padding: '7px 20px', color: 'white', cursor: 'pointer', fontSize: 14, fontWeight: 500,

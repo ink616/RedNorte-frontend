@@ -16,21 +16,35 @@ import AdminDashboard        from './pages/AdminDashboard';
 import AdminConsultasPage    from './pages/AdminConsultasPage';
 import AdminUsuariosPage     from './pages/AdminUsuariosPage';
 import AdminReasignacionPage from './pages/AdminReasignacionPage';
+import DoctorDashboard       from './pages/DoctorDashboard';
 import NotFoundPage          from './pages/NotFoundPage';
 
 const RutaPrivada = () => {
   const { usuario } = useAuth();
   return usuario ? <Outlet /> : <Navigate to="/login" replace />;
 };
+
 const RutaAdmin = () => {
   const { usuario, esAdmin } = useAuth();
   if (!usuario) return <Navigate to="/login" replace />;
-  if (!esAdmin)  return <Navigate to="/mis-consultas" replace />;
+  if (!esAdmin) return <Navigate to="/mis-consultas" replace />;
   return <Outlet />;
 };
+
+const RutaDoctor = () => {
+  const { usuario, esDoctor } = useAuth();
+  if (!usuario) return <Navigate to="/login" replace />;
+  if (!esDoctor) return <Navigate to="/mis-consultas" replace />;
+  return <Outlet />;
+};
+
 const RutaPublica = ({ children }) => {
-  const { usuario, esAdmin } = useAuth();
-  if (usuario) return <Navigate to={esAdmin ? '/admin/dashboard' : '/mis-consultas'} replace />;
+  const { usuario, esAdmin, esDoctor } = useAuth();
+  if (usuario) {
+    if (esAdmin) return <Navigate to="/admin/dashboard" replace />;
+    if (esDoctor) return <Navigate to="/doctor/dashboard" replace />;
+    return <Navigate to="/mis-consultas" replace />;
+  }
   return children;
 };
 
@@ -39,11 +53,11 @@ function AppRoutes() {
     <>
       <Navbar />
       <Routes>
-        <Route path="/"              element={<HomePage />} />
-        <Route path="/inicio"        element={<HomePage />} />
+        <Route path="/"               element={<HomePage />} />
+        <Route path="/inicio"         element={<HomePage />} />
         <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
-        <Route path="/login"         element={<RutaPublica><LoginPage /></RutaPublica>} />
-        <Route path="/registro"      element={<RutaPublica><RegistroPage /></RutaPublica>} />
+        <Route path="/login"          element={<RutaPublica><LoginPage /></RutaPublica>} />
+        <Route path="/registro"       element={<RutaPublica><RegistroPage /></RutaPublica>} />
 
         <Route element={<RutaPrivada />}>
           <Route path="/mis-consultas"       element={<MisConsultasPage />} />
@@ -57,6 +71,11 @@ function AppRoutes() {
           <Route path="/admin/consultas"    element={<AdminConsultasPage />} />
           <Route path="/admin/usuarios"     element={<AdminUsuariosPage />} />
           <Route path="/admin/reasignacion" element={<AdminReasignacionPage />} />
+        </Route>
+
+        <Route element={<RutaDoctor />}>
+          <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+          <Route path="/doctor/perfil"    element={<PerfilPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

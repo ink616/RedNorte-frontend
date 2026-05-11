@@ -52,10 +52,11 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('rednorte_usuario');
   };
 
-  const esAdmin = usuario?.rol?.tag === 'ADMIN';
+  const esAdmin  = usuario?.rol?.tag === 'ADMIN';
+  const esDoctor = usuario?.rol?.tag === 'DOCTOR';
 
   return (
-    <AuthContext.Provider value={{ usuario, iniciarSesion, cerrarSesion, esAdmin }}>
+    <AuthContext.Provider value={{ usuario, iniciarSesion, cerrarSesion, esAdmin, esDoctor }}>
       {children}
     </AuthContext.Provider>
   );
