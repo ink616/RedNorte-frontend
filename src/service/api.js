@@ -6,7 +6,7 @@ const MS_REASIGNACION = 'http://localhost:8082';
 
 // ─── USUARIOS ────────────────────────────────────────────────
 export const login = (mail, pass) =>
-  axios.post(`${MS_USUARIOS}/usuarios/login`, { mail, pass }).then(r => r.data);
+  axios.post(`${MS_USUARIOS}/usuarios/login`, { mail, pass }, { responseType: 'text' }).then(r => r.data);
 
 export const registrarUsuario = (datos) =>
   axios.post(`${MS_USUARIOS}/usuarios`, datos).then(r => r.data);
@@ -45,3 +45,11 @@ export const eliminarConsulta = (id) =>
 // ─── REASIGNACIÓN ─────────────────────────────────────────────
 export const cancelarYReasignar = (bloqueId, motivo) =>
   axios.post(`${MS_REASIGNACION}/api/reasignacion/cancelar-y-reasignar/${bloqueId}?motivo=${encodeURIComponent(motivo)}`).then(r => r.data);
+// ─── FICHA MÉDICA ─────────────────────────────────────────────
+const MS_FICHA = 'http://localhost:8084';
+
+export const obtenerFicha = (usuarioId) =>
+  axios.get(`${MS_FICHA}/ficha/${usuarioId}`).then(r => r.data).catch(() => null);
+
+export const guardarFicha = (usuarioId, datos) =>
+  axios.put(`${MS_FICHA}/ficha/${usuarioId}`, datos).then(r => r.data);

@@ -4,9 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { crearConsulta } from '../service/api';
 
 const ESPECIALIDADES = [
-  'Cardiología','Dermatología','Gastroenterología','Ginecología',
-  'Medicina General','Neurología','Oftalmología','Ortopedia',
-  'Otorrinolaringología','Pediatría','Psiquiatría','Traumatología','Urología'
+  'cardiologia','dermatologia','gastroenterologia','ginecologia',
+  'medicina general','neurologia','oftalmologia','ortopedia',
+  'otorrinolaringologia','pediatria','psiquiatria','traumatologia','urologia'
 ];
 
 export default function NuevaConsultaPage() {
@@ -22,9 +22,15 @@ export default function NuevaConsultaPage() {
     if (!form.especialidad) { setError('Selecciona una especialidad.'); return; }
     setLoading(true);
     try {
-      await crearConsulta({ usuarioId: usuario.id, ...form, especialidad: form.especialidad.toLowerCase() });
+      await crearConsulta({
+        usuarioId: usuario.id,
+        nombrePaciente: form.nombrePaciente,
+        especialidad: form.especialidad,
+        sintomas: form.sintomas,
+      });
       navigate('/mis-consultas');
-    } catch { setError('Error al crear la consulta. Intenta de nuevo.');
+    } catch {
+      setError('Error al crear la consulta. Intenta de nuevo.');
     } finally { setLoading(false); }
   };
 
@@ -51,7 +57,11 @@ export default function NuevaConsultaPage() {
             <select className="form-control" value={form.especialidad}
               onChange={e => setForm({ ...form, especialidad: e.target.value })} required>
               <option value="">Selecciona una especialidad...</option>
-              {ESPECIALIDADES.map(e => <option key={e} value={e}>{e}</option>)}
+              {ESPECIALIDADES.map(e => (
+                <option key={e} value={e}>
+                  {e.charAt(0).toUpperCase() + e.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -59,7 +69,7 @@ export default function NuevaConsultaPage() {
             <label>Descripción de síntomas</label>
             <textarea className="form-control" value={form.sintomas}
               onChange={e => setForm({ ...form, sintomas: e.target.value })}
-              placeholder="Describe detalladamente tus síntomas: qué sientes, desde cuándo, con qué frecuencia, qué los empeora o mejora..."
+              placeholder="Describe detalladamente tus síntomas..."
               style={{ minHeight: 120 }} required />
           </div>
 

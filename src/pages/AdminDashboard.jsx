@@ -9,7 +9,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     Promise.all([listarTodasConsultas(), listarUsuarios()])
-      .then(([c, u]) => { setConsultas(c); setUsuarios(u); })
+      .then(([c, u]) => { setConsultas(Array.isArray(c) ? c : []); setUsuarios(Array.isArray(u) ? u : []); })
       .finally(() => setLoading(false));
   }, []);
 
