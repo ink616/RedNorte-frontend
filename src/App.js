@@ -3,32 +3,31 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import './index.css';
-
-import Navbar               from './components/Navbar';
-import HomePage             from './pages/HomePage';
-import LoginPage            from './pages/LoginPage';
-import RegistroPage         from './pages/RegistroPage';
-import MisConsultasPage     from './pages/MisConsultasPage';
-import NuevaConsultaPage    from './pages/NuevaConsultaPage';
-import EditarConsultaPage   from './pages/EditarConsultaPage';
-import PerfilPage           from './pages/PerfilPage';
-import AdminDashboard       from './pages/AdminDashboard';
-import AdminConsultasPage   from './pages/AdminConsultasPage';
-import AdminUsuariosPage    from './pages/AdminUsuariosPage';
+import Navbar                from './components/Navbar';
+import HomePage              from './pages/HomePage';
+import LoginPage             from './pages/LoginPage';
+import RegistroPage          from './pages/RegistroPage';
+import SobreNosotrosPage     from './pages/SobreNosotrosPage';
+import MisConsultasPage      from './pages/MisConsultasPage';
+import NuevaConsultaPage     from './pages/NuevaConsultaPage';
+import EditarConsultaPage    from './pages/EditarConsultaPage';
+import PerfilPage            from './pages/PerfilPage';
+import AdminDashboard        from './pages/AdminDashboard';
+import AdminConsultasPage    from './pages/AdminConsultasPage';
+import AdminUsuariosPage     from './pages/AdminUsuariosPage';
 import AdminReasignacionPage from './pages/AdminReasignacionPage';
+import NotFoundPage          from './pages/NotFoundPage';
 
 const RutaPrivada = () => {
   const { usuario } = useAuth();
   return usuario ? <Outlet /> : <Navigate to="/login" replace />;
 };
-
 const RutaAdmin = () => {
   const { usuario, esAdmin } = useAuth();
   if (!usuario) return <Navigate to="/login" replace />;
   if (!esAdmin)  return <Navigate to="/mis-consultas" replace />;
   return <Outlet />;
 };
-
 const RutaPublica = ({ children }) => {
   const { usuario, esAdmin } = useAuth();
   if (usuario) return <Navigate to={esAdmin ? '/admin/dashboard' : '/mis-consultas'} replace />;
@@ -40,9 +39,11 @@ function AppRoutes() {
     <>
       <Navbar />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login"   element={<RutaPublica><LoginPage /></RutaPublica>} />
-        <Route path="/registro" element={<RutaPublica><RegistroPage /></RutaPublica>} />
+        <Route path="/"              element={<HomePage />} />
+        <Route path="/inicio"        element={<HomePage />} />
+        <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
+        <Route path="/login"         element={<RutaPublica><LoginPage /></RutaPublica>} />
+        <Route path="/registro"      element={<RutaPublica><RegistroPage /></RutaPublica>} />
 
         <Route element={<RutaPrivada />}>
           <Route path="/mis-consultas"       element={<MisConsultasPage />} />
@@ -58,7 +59,7 @@ function AppRoutes() {
           <Route path="/admin/reasignacion" element={<AdminReasignacionPage />} />
         </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   );
