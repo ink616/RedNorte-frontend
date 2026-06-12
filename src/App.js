@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { ThemeProvider } from './context/ThemeContext';
-import './index.css';
-import Navbar                from './components/Navbar';
+import { ThemeProvider }     from './context/ThemeContext';
+import                            './index.css';
+import Footer                from './components/Footer';
+import Navbar                from './components/navbar';
 import HomePage              from './pages/HomePage';
 import LoginPage             from './pages/LoginPage';
 import RegistroPage          from './pages/RegistroPage';
@@ -80,6 +81,7 @@ function AppRoutes() {
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <Footer /> 
     </>
   );
 }

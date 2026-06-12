@@ -46,7 +46,10 @@ export default function Navbar() {
     }}>
 
       {/* Logo */}
-      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', flexShrink: 0 }}>
+      <Link 
+        to={esAdmin ? '/admin/dashboard' : esDoctor ? '/doctor/dashboard' : '/'}
+        style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', flexShrink: 0 }}
+      >
         <img src="/logo.png" alt="RedNorte" style={{ height: 56, width: 'auto' }} />
         <div style={{ lineHeight: 1.2 }}>
           <div style={{ color: 'white', fontWeight: 800, fontSize: 22, letterSpacing: '-0.3px' }}>
