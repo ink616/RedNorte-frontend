@@ -1,19 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { listarTodasConsultas, actualizarConsultaAdmin } from '../service/api';
+import { listarTodasConsultas, actualizarConsultaAdmin, registrarAuditoria } from '../service/api';
+import Badge from '../components/Badge';
 
 const ESTADOS = ['PENDIENTE', 'AGENDADA', 'ATENDIDA', 'CANCELADA'];
-
-const badgeColor = (estado) => {
-  const map = {
-    PENDIENTE: { bg: '#FAEEDA', color: '#854F0B' },
-    AGENDADA:  { bg: '#E6F1FB', color: '#185FA5' },
-    ATENDIDA:  { bg: '#E1F5EE', color: '#0F6E56' },
-    CANCELADA: { bg: '#FCEBEB', color: '#A32D2D' },
-    REASIGNADA:{ bg: '#EDE9FE', color: '#5B21B6' },
-  };
-  return map[estado] || { bg: '#F3F4F6', color: '#6B7280' };
-};
 
 export default function DoctorDashboard() {
   const { usuario } = useAuth();
@@ -32,16 +23,11 @@ export default function DoctorDashboard() {
 
   const cargar = () => {
     setLoading(true);
-    listarTodasConsultas()
-      .then(data => setConsultas(Array.isArray(data) ? data : []))
-      .finally(() => setLoading(false));
+    listarTodasConsultas().then(d => setConsultas(Array.isArray(d) ? d : [])).finally(() => setLoading(false));
   };
-
   useEffect(() => { cargar(); }, []);
 
-  const consultasFiltradas = filtro === 'TODAS'
-    ? consultas
-    : consultas.filter(c => c.estado === filtro);
+  const filtradas = filtro === 'TODAS' ? consultas : consultas.filter(c => c.estado === filtro);
 
   const stats = {
     total: consultas.length,
@@ -50,153 +36,118 @@ export default function DoctorDashboard() {
     atendidas: consultas.filter(c => c.estado === 'ATENDIDA').length,
   };
 
-  const handleActualizar = async () => {
+  const actualizar = async () => {
     if (!nuevoEstado) return;
     setGuardando(true);
     try {
-      await actualizarConsultaAdmin(consultaActiva.id, {
-        estado: nuevoEstado,
-        notasAdmin: notas,
-      });
+      await actualizarConsultaAdmin(consultaActiva.id, { estado: nuevoEstado, notasAdmin: notas });
+      registrarAuditoria({
+        accion:'ACTUALIZAR', modulo:'CONSULTAS', usuarioId: usuario?.id ? String(usuario.id) : 'DOCTOR',
+        usuarioRol:'DOCTOR', recursoId:String(consultaActiva.id),
+        descripcion:`Doctor actualizo consulta #${consultaActiva.id} a ${nuevoEstado}`, resultado:'EXITOSO',
+      }).catch(() => {});
       setExito('Estado actualizado correctamente.');
-      setConsultaActiva(null);
-      cargar();
+      setConsultaActiva(null); cargar();
       setTimeout(() => setExito(''), 3000);
     } catch {} finally { setGuardando(false); }
   };
 
   return (
     <div className="page">
-
-      {/* Header doctor */}
       <div style={{
-        background: 'linear-gradient(135deg,#1e3a8a,#0f766e)',
-        borderRadius: 16, padding: '1.5rem 2rem', marginBottom: 24,
-        display: 'flex', alignItems: 'center', gap: 16, color: 'white',
+        background:'linear-gradient(135deg,#1e3a8a,#0f766e)', borderRadius:16,
+        padding:'24px 28px', marginBottom:24, display:'flex', alignItems:'center', gap:16, color:'white',
       }}>
-        <div style={{
-          width: 64, height: 64, borderRadius: '50%',
-          background: 'rgba(255,255,255,0.2)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 24, fontWeight: 700, flexShrink: 0,
-          border: '3px solid rgba(255,255,255,0.4)',
-        }}>{iniciales}</div>
+        <div style={{ width:64, height:64, borderRadius:'50%', background:'rgba(255,255,255,0.2)',
+          display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, fontWeight:700,
+          flexShrink:0, border:'3px solid rgba(255,255,255,0.4)' }}>{iniciales}</div>
         <div>
-          <div style={{ fontWeight: 700, fontSize: 20, marginBottom: 4 }}>{nombre}</div>
-          <div style={{ opacity: 0.8, fontSize: 13 }}>{usuario?.mail}</div>
-          <span style={{ background: 'rgba(255,255,255,0.2)', padding: '2px 12px', borderRadius: 20, fontSize: 12, marginTop: 6, display: 'inline-block' }}>
-            🩺 Médico — RedNorte Clínica Digital
+          <div style={{ fontWeight:700, fontSize:20, marginBottom:4 }}>{nombre}</div>
+          <div style={{ opacity:0.8, fontSize:13 }}>{usuario?.mail}</div>
+          <span style={{ background:'rgba(255,255,255,0.2)', padding:'2px 12px', borderRadius:20, fontSize:12, marginTop:6, display:'inline-block' }}>
+            Medico - RedNorte Clinica Digital
           </span>
         </div>
-        <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-          <div style={{ fontSize: 32, fontWeight: 800 }}>{stats.total}</div>
-          <div style={{ opacity: 0.7, fontSize: 12 }}>Consultas totales</div>
+        <div style={{ marginLeft:'auto', textAlign:'right', display:'flex', flexDirection:'column', gap:10, alignItems:'flex-end' }}>
+          <div><div style={{ fontSize:32, fontWeight:800 }}>{stats.total}</div><div style={{ opacity:0.7, fontSize:12 }}>Consultas totales</div></div>
+          <Link to="/doctor/agenda" style={{ background:'rgba(255,255,255,0.2)', color:'white', textDecoration:'none',
+            padding:'8px 16px', borderRadius:20, fontSize:13, fontWeight:600, border:'1px solid rgba(255,255,255,0.3)', whiteSpace:'nowrap' }}>Ver mi agenda</Link>
         </div>
       </div>
 
-      {exito && <div className="alert alert-success" style={{ marginBottom: 16 }}>✅ {exito}</div>}
+      {exito && <div className="alert alert-success">{exito}</div>}
 
-      {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 24 }}>
+      <div className="grid-4 stagger" style={{ marginBottom:24 }}>
         {[
-          { label: 'Pendientes', val: stats.pendientes, color: '#F59E0B', icon: '⏳' },
-          { label: 'Agendadas',  val: stats.agendadas,  color: '#2563EB', icon: '📅' },
-          { label: 'Atendidas',  val: stats.atendidas,  color: '#10B981', icon: '✅' },
-          { label: 'Total',      val: stats.total,       color: '#7C3AED', icon: '📋' },
+          { label:'Pendientes', val:stats.pendientes, color:'var(--warning)', bg:'var(--warning-light)', icon:'⏳' },
+          { label:'Agendadas',  val:stats.agendadas,  color:'var(--primary)', bg:'var(--primary-light)', icon:'📅' },
+          { label:'Atendidas',  val:stats.atendidas,  color:'var(--success)', bg:'var(--success-light)', icon:'✅' },
+          { label:'Total',      val:stats.total,      color:'var(--purple)',  bg:'var(--purple-light)',  icon:'📋' },
         ].map(s => (
-          <div key={s.label} style={{ background: 'var(--color-background-secondary)', borderRadius: 12, padding: '1rem', textAlign: 'center', border: '0.5px solid var(--color-border-tertiary)' }}>
-            <div style={{ fontSize: 24, marginBottom: 4 }}>{s.icon}</div>
-            <div style={{ fontSize: 26, fontWeight: 700, color: s.color }}>{s.val}</div>
-            <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{s.label}</div>
+          <div key={s.label} className="stat-card" style={{ '--accent-color': s.color }}>
+            <div className="stat-icon" style={{ background:s.bg }}>{s.icon}</div>
+            <div><div className="stat-num" style={{ color:s.color }}>{s.val}</div><div className="stat-label">{s.label}</div></div>
           </div>
         ))}
       </div>
 
-      {/* Filtros */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+      <div className="filter-bar">
         {['TODAS', ...ESTADOS].map(e => (
-          <button key={e} onClick={() => setFiltro(e)} style={{
-            padding: '6px 16px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: filtro === e ? 700 : 400,
-            background: filtro === e ? '#2563EB' : 'var(--color-background-secondary)',
-            color: filtro === e ? 'white' : 'var(--color-text-secondary)',
-            border: filtro === e ? 'none' : '0.5px solid var(--color-border-tertiary)',
-          }}>{e}</button>
+          <button key={e} className={`filter-chip ${filtro===e?'active':''}`} onClick={() => setFiltro(e)}>{e}</button>
         ))}
       </div>
 
-      {/* Tabla consultas */}
       {loading ? <div className="spinner">Cargando consultas...</div> : (
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <table className="tabla">
-            <thead>
-              <tr><th>N°</th><th>Paciente</th><th>Especialidad</th><th>Síntomas</th><th>Estado</th><th>Fecha</th><th>Acción</th></tr>
-            </thead>
-            <tbody>
-              {consultasFiltradas.map(c => {
-                const { bg, color } = badgeColor(c.estado);
-                return (
+        <div className="card card-pad-0">
+          <div className="table-wrap">
+            <table className="tabla">
+              <thead><tr><th>N°</th><th>Paciente</th><th>Especialidad</th><th>Síntomas</th><th>Estado</th><th>Fecha</th><th>Acción</th></tr></thead>
+              <tbody>
+                {filtradas.map(c => (
                   <tr key={c.id}>
-                    <td><strong>#{c.id}</strong></td>
-                    <td>{c.nombrePaciente || '—'}</td>
-                    <td style={{ textTransform: 'capitalize' }}>{c.especialidad}</td>
-                    <td style={{ fontSize: 12, color: 'var(--color-text-secondary)', maxWidth: 200 }}>
-                      {c.sintomas?.slice(0, 60)}{c.sintomas?.length > 60 ? '...' : ''}
-                    </td>
-                    <td>
-                      <span style={{ background: bg, color, borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>
-                        {c.estado}
-                      </span>
-                    </td>
-                    <td style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                      {c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleDateString('es-CL') : '—'}
-                    </td>
-                    <td>
-                      <button onClick={() => { setConsultaActiva(c); setNuevoEstado(c.estado); setNotas(c.notasAdmin || ''); }}
-                        className="btn btn-ghost" style={{ fontSize: 12, padding: '4px 12px' }}>
-                        Actualizar
-                      </button>
-                    </td>
+                    <td className="tabla-id">#{c.id}</td>
+                    <td style={{ fontWeight:500 }}>{c.nombrePaciente || '-'}</td>
+                    <td style={{ textTransform:'capitalize' }}>{c.especialidad}</td>
+                    <td style={{ fontSize:12.5, color:'var(--text-muted)', maxWidth:200 }}>{c.sintomas?.slice(0,60)}{c.sintomas?.length > 60 ? '...' : ''}</td>
+                    <td><Badge estado={c.estado} /></td>
+                    <td style={{ fontSize:12.5, color:'var(--text-muted)' }}>{c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleDateString('es-CL') : '-'}</td>
+                    <td><button className="btn btn-ghost btn-sm" onClick={() => { setConsultaActiva(c); setNuevoEstado(c.estado); setNotas(c.notasAdmin || ''); }}>Actualizar</button></td>
                   </tr>
-                );
-              })}
-              {consultasFiltradas.length === 0 && (
-                <tr><td colSpan={7} style={{ textAlign: 'center', padding: 32, color: 'var(--color-text-secondary)' }}>Sin consultas.</td></tr>
-              )}
-            </tbody>
-          </table>
+                ))}
+                {filtradas.length === 0 && <tr><td colSpan={7} style={{ textAlign:'center', padding:32, color:'var(--text-muted)' }}>Sin consultas.</td></tr>}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
-      {/* Modal actualizar estado */}
       {consultaActiva && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: '#FFFFFF', borderRadius: 16, width: '100%', maxWidth: 480, padding: '2rem', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: '#111827' }}>Actualizar consulta #{consultaActiva.id}</h3>
-            <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 20 }}>{consultaActiva.nombrePaciente} — {consultaActiva.especialidad}</p>
-
-            <div style={{ background: '#F9FAFB', borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 4 }}>Síntomas del paciente</div>
-              <div style={{ fontSize: 13, color: '#111827' }}>{consultaActiva.sintomas}</div>
+        <div className="modal-overlay" onClick={()=>setConsultaActiva(null)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Actualizar consulta #{consultaActiva.id}</h2>
+              <button className="modal-close" onClick={() => setConsultaActiva(null)}>✕</button>
             </div>
-
-            <div className="form-group">
-              <label style={{ color: '#374151' }}>Nuevo estado</label>
-              <select className="form-control" value={nuevoEstado} onChange={e => setNuevoEstado(e.target.value)}>
-                {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
-              </select>
+            <div className="modal-body">
+              <p style={{ fontSize:13, color:'var(--text-muted)', marginBottom:16 }}>{consultaActiva.nombrePaciente} - {consultaActiva.especialidad}</p>
+              <div style={{ background:'var(--bg-soft)', borderRadius:10, padding:'14px 16px', marginBottom:16 }}>
+                <div style={{ fontSize:12, color:'var(--text-muted)', marginBottom:4 }}>Síntomas del paciente</div>
+                <div style={{ fontSize:13, color:'var(--text)' }}>{consultaActiva.sintomas}</div>
+              </div>
+              <div className="form-group">
+                <label>Nuevo estado</label>
+                <select className="form-control" value={nuevoEstado} onChange={e => setNuevoEstado(e.target.value)}>
+                  {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Notas médicas</label>
+                <textarea className="form-control" value={notas} onChange={e => setNotas(e.target.value)} placeholder="Observaciones, indicaciones, proximos pasos..." style={{ minHeight:100 }} />
+              </div>
             </div>
-
-            <div className="form-group">
-              <label style={{ color: '#374151' }}>Notas médicas</label>
-              <textarea className="form-control" value={notas} onChange={e => setNotas(e.target.value)}
-                placeholder="Observaciones, indicaciones, próximos pasos..." style={{ minHeight: 100 }} />
-            </div>
-
-            <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
-              <button onClick={handleActualizar} disabled={guardando} className="btn btn-primary" style={{ flex: 1 }}>
-                {guardando ? 'Guardando...' : '💾 Guardar cambios'}
-              </button>
-              <button onClick={() => setConsultaActiva(null)} className="btn btn-ghost">Cancelar</button>
+            <div className="modal-footer">
+              <button className="btn btn-ghost" style={{ flex:1 }} onClick={() => setConsultaActiva(null)}>Cancelar</button>
+              <button className="btn btn-primary" style={{ flex:2 }} onClick={actualizar} disabled={guardando}>{guardando ? 'Guardando...' : 'Guardar cambios'}</button>
             </div>
           </div>
         </div>

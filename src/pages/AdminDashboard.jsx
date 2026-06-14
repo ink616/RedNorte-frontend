@@ -22,9 +22,9 @@ export default function AdminDashboard() {
   }, []);
 
   const tarjetas = stats ? [
-    { label: 'Total consultas',      valor: stats.totalConsultas,        color: 'var(--primary)', bg: 'var(--primary-light)', icon: '📋' },
-    { label: 'Usuarios registrados', valor: stats.totalUsuarios,         color: 'var(--purple)',  bg: 'var(--purple-light)',  icon: '👥' },
-    { label: 'Bloques de agenda',    valor: stats.totalBloquesAgenda,    color: 'var(--teal)',    bg: 'var(--teal-light)',    icon: '📅' },
+    { label: 'Total consultas',      valor: stats.totalConsultas,        color: 'var(--primary)',      bg: 'var(--primary-light)', icon: '📋' },
+    { label: 'Usuarios registrados', valor: stats.totalUsuarios,         color: 'var(--purple)',       bg: 'var(--purple-light)',  icon: '👥' },
+    { label: 'Bloques de agenda',    valor: stats.totalBloquesAgenda,    color: 'var(--teal)',         bg: 'var(--teal-light)',    icon: '📅' },
     { label: 'Establecimientos',     valor: stats.totalEstablecimientos, color: 'var(--warning-dark)', bg: 'var(--warning-light)', icon: '🏥' },
     { label: 'Pendientes',           valor: stats.consultasPorEstado?.PENDIENTE || 0, color: 'var(--warning)', bg: 'var(--warning-light)', icon: '⏳' },
     { label: 'Atendidas',            valor: stats.consultasPorEstado?.ATENDIDA  || 0, color: 'var(--success)', bg: 'var(--success-light)', icon: '✅' },
@@ -45,27 +45,25 @@ export default function AdminDashboard() {
     <div className="page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">📊 Panel de control</h1>
+          <h1 className="page-title">Panel de control</h1>
           <p className="page-subtitle">Resumen en tiempo real del sistema RedNorte</p>
         </div>
       </div>
 
       {loading ? <div className="spinner">Cargando estadísticas...</div> : (
         <>
-          {/* Stats */}
           <div className="grid-3 stagger" style={{ marginBottom: 28 }}>
             {tarjetas.map(t => (
               <div key={t.label} className="stat-card" style={{ '--accent-color': t.color }}>
                 <div className="stat-icon" style={{ background: t.bg }}>{t.icon}</div>
                 <div>
-                  <div className="stat-num" style={{ color: t.color }}>{t.valor ?? '—'}</div>
+                  <div className="stat-num" style={{ color: t.color }}>{t.valor ?? '-'}</div>
                   <div className="stat-label">{t.label}</div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Distribución */}
           {stats?.consultasPorEstado && (
             <div className="card" style={{ marginBottom: 24 }}>
               <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 700 }}>Distribución de consultas por estado</h3>
@@ -85,13 +83,14 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* Accesos rápidos */}
-          <div className="grid-4 stagger" style={{ marginBottom: 24 }}>
+          <div className="grid-3 stagger" style={{ marginBottom: 24 }}>
             {[
-              { to: '/admin/consultas',        icon: '📋', label: 'Consultas',        desc: 'Gestionar todas' },
+              { to: '/admin/consultas',        icon: '📋', label: 'Consultas',        desc: 'Gestionar todas las citas' },
               { to: '/admin/usuarios',         icon: '👥', label: 'Usuarios',         desc: 'Administrar cuentas' },
-              { to: '/admin/establecimientos', icon: '🏥', label: 'Establecimientos', desc: 'Red de clínicas' },
+              { to: '/admin/establecimientos', icon: '🏥', label: 'Establecimientos', desc: 'Red de centros de salud' },
               { to: '/admin/agenda',           icon: '📅', label: 'Agenda',           desc: 'Bloques horarios' },
+              { to: '/admin/reasignacion',     icon: '🔄', label: 'Reasignación',     desc: 'Cancelar y reasignar' },
+              { to: '/admin/auditoria',        icon: '📜', label: 'Auditoría',        desc: 'Trazabilidad del sistema' },
             ].map(a => (
               <Link key={a.to} to={a.to} className="shortcut-card">
                 <span className="icon">{a.icon}</span>
@@ -101,11 +100,10 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* Últimas consultas */}
           <div className="card card-pad-0">
             <div className="card-header">
-              <span>🕐 Últimas consultas ingresadas</span>
-              <Link to="/admin/consultas" style={{ fontSize: 13, color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>Ver todas →</Link>
+              <span>Últimas consultas ingresadas</span>
+              <Link to="/admin/consultas" style={{ fontSize: 13, color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>Ver todas</Link>
             </div>
             <div className="table-wrap">
               <table className="tabla">
@@ -116,11 +114,11 @@ export default function AdminDashboard() {
                   {recientes.map(c => (
                     <tr key={c.id}>
                       <td className="tabla-id">#{c.id}</td>
-                      <td style={{ fontWeight: 500 }}>{c.nombrePaciente || '—'}</td>
+                      <td style={{ fontWeight: 500 }}>{c.nombrePaciente || '-'}</td>
                       <td style={{ textTransform: 'capitalize', color: 'var(--text-soft)' }}>{c.especialidad}</td>
                       <td><Badge estado={c.estado} /></td>
                       <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-                        {c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleDateString('es-CL') : '—'}
+                        {c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleDateString('es-CL') : '-'}
                       </td>
                     </tr>
                   ))}

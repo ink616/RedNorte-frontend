@@ -21,7 +21,10 @@ export default function MisConsultasPage() {
     <div className="page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h2 className="page-title" style={{ margin: 0 }}>📋 Mis consultas</h2>
-        <Link to="/nueva-consulta" className="btn btn-primary">+ Nueva consulta</Link>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Link to="/reservar-hora" className="btn btn-teal">🗓️ Reservar hora</Link>
+          <Link to="/nueva-consulta" className="btn btn-primary">+ Nueva consulta</Link>
+        </div>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}

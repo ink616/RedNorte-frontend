@@ -71,7 +71,7 @@ export default function SobreNosotrosPage() {
   const [tabEquipo, setTabEquipo] = useState(0);
 
   return (
-    <div style={{ background: 'var(--color-background-primary)' }}>
+    <div style={{ background: 'var(--card)' }}>
 
       {/* ── HERO ── */}
       <div style={{
@@ -117,44 +117,44 @@ export default function SobreNosotrosPage() {
             { num: '+15', label: 'Años de experiencia', icon: '📅' },
             { num: '98%', label: 'Satisfacción', icon: '⭐' },
           ].map(s => (
-            <div key={s.label} style={{ background: 'var(--color-background-secondary)', borderRadius: 16, padding: '1.5rem', textAlign: 'center', border: '0.5px solid var(--color-border-tertiary)' }}>
+            <div key={s.label} style={{ background: 'var(--bg-soft)', borderRadius: 16, padding: '1.5rem', textAlign: 'center', border: '0.5px solid var(--border)' }}>
               <div style={{ fontSize: 28, marginBottom: 8 }}>{s.icon}</div>
               <div style={{ fontSize: 28, fontWeight: 900, color: '#2563EB', marginBottom: 4 }}>{s.num}</div>
-              <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{s.label}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{s.label}</div>
             </div>
           ))}
         </div>
 
         {/* Valores */}
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <span style={{ background: 'var(--color-background-secondary)', color: '#2563EB', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Nuestros valores</span>
-          <h2 style={{ fontSize: 28, fontWeight: 800, marginTop: 14, color: 'var(--color-text-primary)' }}>Lo que nos define</h2>
+          <span style={{ background: 'var(--bg-soft)', color: '#2563EB', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Nuestros valores</span>
+          <h2 style={{ fontSize: 28, fontWeight: 800, marginTop: 14, color: 'var(--text)' }}>Lo que nos define</h2>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 64 }}>
           {VALORES.map(v => (
-            <div key={v.titulo} style={{ background: 'var(--color-background-primary)', border: '0.5px solid var(--color-border-tertiary)', borderRadius: 14, padding: '1.5rem', textAlign: 'center' }}>
+            <div key={v.titulo} style={{ background: 'var(--card)', border: '0.5px solid var(--border)', borderRadius: 14, padding: '1.5rem', textAlign: 'center' }}>
               <div style={{ fontSize: 36, marginBottom: 12 }}>{v.icon}</div>
-              <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 8, color: 'var(--color-text-primary)' }}>{v.titulo}</h3>
-              <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>{v.desc}</p>
+              <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 8, color: 'var(--text)' }}>{v.titulo}</h3>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>{v.desc}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* ── EQUIPO MÉDICO ── */}
-      <div style={{ background: 'var(--color-background-secondary)', padding: '5rem 2rem' }}>
+      <div style={{ background: 'var(--bg-soft)', padding: '5rem 2rem' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <span style={{ background: 'var(--color-background-primary)', color: '#2563EB', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Profesionales</span>
-            <h2 style={{ fontSize: 28, fontWeight: 800, marginTop: 14, marginBottom: 8, color: 'var(--color-text-primary)' }}>Nuestro equipo médico</h2>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: 15 }}>Especialistas comprometidos con tu salud y bienestar</p>
+            <span style={{ background: 'var(--card)', color: '#2563EB', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Profesionales</span>
+            <h2 style={{ fontSize: 28, fontWeight: 800, marginTop: 14, marginBottom: 8, color: 'var(--text)' }}>Nuestro equipo médico</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>Especialistas comprometidos con tu salud y bienestar</p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 20 }}>
             {EQUIPO.map((m, i) => (
               <div key={m.nombre} style={{
-                background: 'var(--color-background-primary)', borderRadius: 16, padding: '1.75rem',
-                border: '0.5px solid var(--color-border-tertiary)', transition: 'all 0.25s',
+                background: 'var(--card)', borderRadius: 16, padding: '1.75rem',
+                border: '0.5px solid var(--border)', transition: 'all 0.25s',
               }}
                 onMouseEnter={e => { e.currentTarget.style.transform='translateY(-4px)'; e.currentTarget.style.boxShadow='0 12px 32px rgba(0,0,0,0.1)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='none'; }}
@@ -167,12 +167,12 @@ export default function SobreNosotrosPage() {
                     color: 'white', fontWeight: 800, fontSize: 18,
                   }}>{m.iniciales}</div>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-text-primary)', marginBottom: 2 }}>{m.nombre}</div>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', marginBottom: 2 }}>{m.nombre}</div>
                     <div style={{ fontSize: 12, color: m.color, fontWeight: 600 }}>{m.especialidad}</div>
-                    <div style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{m.cargo}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{m.cargo}</div>
                   </div>
                 </div>
-                <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>{m.descripcion}</p>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>{m.descripcion}</p>
               </div>
             ))}
           </div>
@@ -185,15 +185,15 @@ export default function SobreNosotrosPage() {
 
           {/* Horarios */}
           <div>
-            <span style={{ background: 'var(--color-background-secondary)', color: '#2563EB', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Atención</span>
-            <h2 style={{ fontSize: 26, fontWeight: 800, marginTop: 14, marginBottom: 20, color: 'var(--color-text-primary)' }}>Horarios de atención</h2>
+            <span style={{ background: 'var(--bg-soft)', color: '#2563EB', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Atención</span>
+            <h2 style={{ fontSize: 26, fontWeight: 800, marginTop: 14, marginBottom: 20, color: 'var(--text)' }}>Horarios de atención</h2>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
               {HORARIOS.map(h => (
-                <div key={h.dia} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--color-background-secondary)', borderRadius: 12, padding: '16px 20px', border: '0.5px solid var(--color-border-tertiary)' }}>
+                <div key={h.dia} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-soft)', borderRadius: 12, padding: '16px 20px', border: '0.5px solid var(--border)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <span style={{ fontSize: 20 }}>🕐</span>
-                    <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--color-text-primary)' }}>{h.dia}</span>
+                    <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--text)' }}>{h.dia}</span>
                   </div>
                   <span style={{ fontWeight: 700, fontSize: 14, color: '#2563EB', background: '#EFF6FF', padding: '4px 12px', borderRadius: 20 }}>{h.horario}</span>
                 </div>
@@ -211,11 +211,11 @@ export default function SobreNosotrosPage() {
 
           {/* Ubicación */}
           <div>
-            <span style={{ background: 'var(--color-background-secondary)', color: '#0D9488', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Dónde estamos</span>
-            <h2 style={{ fontSize: 26, fontWeight: 800, marginTop: 14, marginBottom: 20, color: 'var(--color-text-primary)' }}>Nuestra ubicación</h2>
+            <span style={{ background: 'var(--bg-soft)', color: '#0D9488', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Dónde estamos</span>
+            <h2 style={{ fontSize: 26, fontWeight: 800, marginTop: 14, marginBottom: 20, color: 'var(--text)' }}>Nuestra ubicación</h2>
 
             {/* Mapa simulado */}
-            <div style={{ background: 'linear-gradient(135deg,#F1F5F9,#E2E8F0)', borderRadius: 14, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, border: '0.5px solid var(--color-border-tertiary)', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ background: 'linear-gradient(135deg,#F1F5F9,#E2E8F0)', borderRadius: 14, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, border: '0.5px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position:'absolute', inset:0, background: 'repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(0,0,0,0.04) 40px,rgba(0,0,0,0.04) 41px), repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(0,0,0,0.04) 40px,rgba(0,0,0,0.04) 41px)' }}/>
               <div style={{ textAlign:'center', position:'relative', zIndex:1 }}>
                 <div style={{ fontSize:48, marginBottom:8 }}>📍</div>
@@ -231,11 +231,11 @@ export default function SobreNosotrosPage() {
                 { icon: '🚌', label: 'Buses', valor: 'Líneas 210, 505, C02' },
                 { icon: '🚗', label: 'Estacionamiento', valor: 'Disponible en el edificio' },
               ].map(u => (
-                <div key={u.label} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 14px', background: 'var(--color-background-secondary)', borderRadius: 10, border: '0.5px solid var(--color-border-tertiary)' }}>
+                <div key={u.label} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 14px', background: 'var(--bg-soft)', borderRadius: 10, border: '0.5px solid var(--border)' }}>
                   <span style={{ fontSize: 20 }}>{u.icon}</span>
                   <div>
-                    <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 1 }}>{u.label}</div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>{u.valor}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 1 }}>{u.label}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{u.valor}</div>
                   </div>
                 </div>
               ))}
@@ -261,7 +261,7 @@ export default function SobreNosotrosPage() {
       )}
 
       {/* Footer */}
-      <div style={{ borderTop: '0.5px solid var(--color-border-tertiary)', padding: '2rem', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: 13 }}>
+      <div style={{ borderTop: '0.5px solid var(--border)', padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
         © 2026 RedNorte — Clínica Digital · Todos los derechos reservados
       </div>
     </div>

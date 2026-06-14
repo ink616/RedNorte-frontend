@@ -25,17 +25,17 @@ const Tooltip = ({ texto }) => {
   return (
     <span style={{ position: 'relative', display: 'inline-block', marginLeft: 6 }}>
       <span onClick={() => setVisible(!visible)} style={{
-        width: 18, height: 18, borderRadius: '50%', background: 'var(--color-background-secondary)',
-        border: '1px solid var(--color-border-tertiary)', display: 'inline-flex',
+        width: 18, height: 18, borderRadius: '50%', background: 'var(--bg-soft)',
+        border: '1px solid var(--border)', display: 'inline-flex',
         alignItems: 'center', justifyContent: 'center', fontSize: 11,
-        cursor: 'pointer', color: 'var(--color-text-secondary)', fontWeight: 700, userSelect: 'none',
+        cursor: 'pointer', color: 'var(--text-muted)', fontWeight: 700, userSelect: 'none',
       }}>?</span>
       {visible && (
         <div onClick={() => setVisible(false)} style={{
           position: 'absolute', bottom: 24, left: 0, zIndex: 100, width: 220,
-          background: 'var(--color-background-primary)', border: '0.5px solid var(--color-border-tertiary)',
+          background: 'var(--card)', border: '0.5px solid var(--border)',
           borderRadius: 8, padding: '10px 12px', fontSize: 12,
-          color: 'var(--color-text-secondary)', lineHeight: 1.5, boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+          color: 'var(--text-muted)', lineHeight: 1.5, boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
         }}>{texto}</div>
       )}
     </span>
@@ -44,8 +44,8 @@ const Tooltip = ({ texto }) => {
 
 const NoSeBtn = ({ onClick }) => (
   <button type="button" onClick={onClick} style={{
-    fontSize: 11, color: 'var(--color-text-secondary)', background: 'none',
-    border: '0.5px dashed var(--color-border-tertiary)', borderRadius: 20,
+    fontSize: 11, color: 'var(--text-muted)', background: 'none',
+    border: '0.5px dashed var(--border)', borderRadius: 20,
     padding: '2px 10px', cursor: 'pointer', marginTop: 4,
   }}>No sé / No tengo este dato</button>
 );
@@ -68,10 +68,10 @@ const TagSelector = ({ opciones, seleccionados, onChange, placeholder }) => {
       <input className="form-control" value={input} onChange={e => setInput(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && agregar(input)} placeholder={placeholder} style={{ marginBottom: 6 }} />
       {input && filtradas.length > 0 && (
-        <div style={{ border: '0.5px solid var(--color-border-tertiary)', borderRadius: 8, background: 'var(--color-background-primary)', maxHeight: 160, overflowY: 'auto' }}>
+        <div style={{ border: '0.5px solid var(--border)', borderRadius: 8, background: 'var(--card)', maxHeight: 160, overflowY: 'auto' }}>
           {filtradas.slice(0, 6).map(o => (
-            <div key={o} onClick={() => agregar(o)} style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 13, borderBottom: '0.5px solid var(--color-border-tertiary)' }}
-              onMouseEnter={e => e.target.style.background = 'var(--color-background-secondary)'}
+            <div key={o} onClick={() => agregar(o)} style={{ padding: '8px 12px', cursor: 'pointer', fontSize: 13, borderBottom: '0.5px solid var(--border)' }}
+              onMouseEnter={e => e.target.style.background = 'var(--bg-soft)'}
               onMouseLeave={e => e.target.style.background = 'transparent'}>{o}</div>
           ))}
           {!filtradas.find(o => o.toLowerCase() === input.toLowerCase()) && (
@@ -116,7 +116,7 @@ export default function PerfilPage() {
   const imc = ficha.estatura && ficha.peso && ficha.estatura > 0
     ? (ficha.peso / ((ficha.estatura/100)**2)).toFixed(1) : null;
   const imcLabel = imc ? (imc<18.5?'Bajo peso':imc<25?'Normal ✅':imc<30?'Sobrepeso':'Obesidad') : null;
-  const imcColor = imc ? (imc<18.5?'#F59E0B':imc<25?'#10B981':imc<30?'#F59E0B':'#EF4444') : 'var(--color-text-primary)';
+  const imcColor = imc ? (imc<18.5?'#F59E0B':imc<25?'#10B981':imc<30?'#F59E0B':'#EF4444') : 'var(--text)';
 
   const completitud = () => {
     const campos = [ficha.telefono,ficha.estatura,ficha.peso,ficha.grupoSanguineo,ficha.alergias,ficha.condicionesCronicas,ficha.emergenciaNombre];
@@ -138,10 +138,10 @@ export default function PerfilPage() {
   if (loading) return <div className="spinner">Cargando perfil...</div>;
 
   const pct = completitud();
-  const card = { background:'var(--color-background-primary)', border:'0.5px solid var(--color-border-tertiary)', borderRadius:12, padding:'1.25rem', marginBottom:14 };
-  const row = { display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 0', borderBottom:'0.5px solid var(--color-border-tertiary)', fontSize:14 };
+  const card = { background:'var(--card)', border:'0.5px solid var(--border)', borderRadius:12, padding:'1.25rem', marginBottom:14 };
+  const row = { display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 0', borderBottom:'0.5px solid var(--border)', fontSize:14 };
   const tag = (color) => ({ background:color==='red'?'#FCEBEB':color==='amber'?'#FAEEDA':color==='blue'?'#E6F1FB':'#E1F5EE', color:color==='red'?'#A32D2D':color==='amber'?'#854F0B':color==='blue'?'#185FA5':'#0F6E56', borderRadius:20, padding:'3px 12px', fontSize:12, fontWeight:500, display:'inline-block', margin:'2px' });
-  const tags = (str, color) => str ? str.split(',').map(s=>s.trim()).filter(Boolean).map(s=><span key={s} style={tag(color)}>{s}</span>) : <span style={{fontSize:13,color:'var(--color-text-secondary)'}}>Sin registrar</span>;
+  const tags = (str, color) => str ? str.split(',').map(s=>s.trim()).filter(Boolean).map(s=><span key={s} style={tag(color)}>{s}</span>) : <span style={{fontSize:13,color:'var(--text-muted)'}}>Sin registrar</span>;
 
   return (
     <div className="page" style={{ maxWidth:720 }}>
@@ -174,10 +174,10 @@ export default function PerfilPage() {
           { icon:'💊',num:ficha.medicamentosActuales?ficha.medicamentosActuales.split(',').filter(Boolean).length:0,label:'Medicamentos',color:'#F59E0B' },
           { icon:'⚠️',num:ficha.alergias?ficha.alergias.split(',').filter(Boolean).length:0,label:'Alergias',color:'#EF4444' },
         ].map(s=>(
-          <div key={s.label} style={{ background:'var(--color-background-secondary)',borderRadius:10,padding:'1rem',textAlign:'center' }}>
+          <div key={s.label} style={{ background:'var(--bg-soft)',borderRadius:10,padding:'1rem',textAlign:'center' }}>
             <div style={{ fontSize:22,marginBottom:4 }}>{s.icon}</div>
             <div style={{ fontSize:22,fontWeight:600,color:s.color }}>{s.num}</div>
-            <div style={{ fontSize:11,color:'var(--color-text-secondary)' }}>{s.label}</div>
+            <div style={{ fontSize:11,color:'var(--text-muted)' }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -191,14 +191,14 @@ export default function PerfilPage() {
                 <button onClick={()=>setVista('editar')} className="btn btn-ghost" style={{ fontSize:12,padding:'4px 12px' }}>Editar</button>
               </div>
               {[['Estatura',ficha.estatura?`${ficha.estatura} cm`:'—'],['Peso',ficha.peso?`${ficha.peso} kg`:'—'],['Presión arterial',ficha.presionArterial||'—'],['Glucosa',ficha.glucosa||'—'],['Frec. cardíaca',ficha.frecuenciaCardiaca||'—']].map(([k,v])=>(
-                <div key={k} style={{...row}}><span style={{color:'var(--color-text-secondary)',fontSize:13}}>{k}</span><span>{v}</span></div>
+                <div key={k} style={{...row}}><span style={{color:'var(--text-muted)',fontSize:13}}>{k}</span><span>{v}</span></div>
               ))}
             </div>
             <div style={card}>
               <div style={{ fontWeight:500,marginBottom:12 }}>⚠️ Alertas médicas</div>
-              <div style={{ marginBottom:10 }}><div style={{ fontSize:12,color:'var(--color-text-secondary)',marginBottom:6 }}>Alergias</div>{tags(ficha.alergias,'red')}</div>
-              <div style={{ marginBottom:10 }}><div style={{ fontSize:12,color:'var(--color-text-secondary)',marginBottom:6 }}>Condiciones crónicas</div>{tags(ficha.condicionesCronicas,'amber')}</div>
-              <div><div style={{ fontSize:12,color:'var(--color-text-secondary)',marginBottom:6 }}>Medicamentos</div>{tags(ficha.medicamentosActuales,'blue')}</div>
+              <div style={{ marginBottom:10 }}><div style={{ fontSize:12,color:'var(--text-muted)',marginBottom:6 }}>Alergias</div>{tags(ficha.alergias,'red')}</div>
+              <div style={{ marginBottom:10 }}><div style={{ fontSize:12,color:'var(--text-muted)',marginBottom:6 }}>Condiciones crónicas</div>{tags(ficha.condicionesCronicas,'amber')}</div>
+              <div><div style={{ fontSize:12,color:'var(--text-muted)',marginBottom:6 }}>Medicamentos</div>{tags(ficha.medicamentosActuales,'blue')}</div>
             </div>
           </div>
 
@@ -208,9 +208,9 @@ export default function PerfilPage() {
               <button onClick={()=>setVista('editar')} className="btn btn-ghost" style={{ fontSize:12,padding:'4px 12px' }}>Editar</button>
             </div>
             <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16,fontSize:14 }}>
-              <div><div style={{ fontSize:12,color:'var(--color-text-secondary)',marginBottom:4 }}>Teléfono</div><div>{ficha.telefono||'—'}</div></div>
-              <div><div style={{ fontSize:12,color:'var(--color-text-secondary)',marginBottom:4 }}>Dirección</div><div>{ficha.direccion||'—'}</div></div>
-              <div><div style={{ fontSize:12,color:'var(--color-text-secondary)',marginBottom:4 }}>Emergencia</div><div>{ficha.emergenciaNombre?`${ficha.emergenciaNombre} · ${ficha.emergenciaTelefono}`:'—'}</div></div>
+              <div><div style={{ fontSize:12,color:'var(--text-muted)',marginBottom:4 }}>Teléfono</div><div>{ficha.telefono||'—'}</div></div>
+              <div><div style={{ fontSize:12,color:'var(--text-muted)',marginBottom:4 }}>Dirección</div><div>{ficha.direccion||'—'}</div></div>
+              <div><div style={{ fontSize:12,color:'var(--text-muted)',marginBottom:4 }}>Emergencia</div><div>{ficha.emergenciaNombre?`${ficha.emergenciaNombre} · ${ficha.emergenciaTelefono}`:'—'}</div></div>
             </div>
           </div>
 
@@ -313,7 +313,7 @@ export default function PerfilPage() {
               </div>
             </div>
 
-            <div style={{ borderTop:'0.5px solid var(--color-border-tertiary)',paddingTop:16,marginTop:8 }}>
+            <div style={{ borderTop:'0.5px solid var(--border)',paddingTop:16,marginTop:8 }}>
               <div style={{ fontWeight:500,marginBottom:12 }}>🆘 Contacto de emergencia</div>
               <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:14 }}>
                 <div className="form-group"><label>Nombre completo</label><input className="form-control" value={ficha.emergenciaNombre} onChange={setE('emergenciaNombre')} placeholder="María Pérez"/></div>

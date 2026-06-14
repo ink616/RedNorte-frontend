@@ -12,6 +12,7 @@ import SobreNosotrosPage         from './pages/SobreNosotrosPage';
 import MisConsultasPage          from './pages/MisConsultasPage';
 import NuevaConsultaPage         from './pages/NuevaConsultaPage';
 import EditarConsultaPage        from './pages/EditarConsultaPage';
+import ReservarHoraPage          from './pages/ReservarHoraPage';
 import PerfilPage                from './pages/PerfilPage';
 import AdminDashboard            from './pages/AdminDashboard';
 import AdminConsultasPage        from './pages/AdminConsultasPage';
@@ -19,7 +20,9 @@ import AdminUsuariosPage         from './pages/AdminUsuariosPage';
 import AdminReasignacionPage     from './pages/AdminReasignacionPage';
 import AdminEstablecimientosPage from './pages/AdminEstablecimientosPage';
 import AdminAgendaPage           from './pages/AdminAgendaPage';
+import AdminAuditoriaPage        from './pages/AdminAuditoriaPage';
 import DoctorDashboard           from './pages/DoctorDashboard';
+import DoctorAgendaPage          from './pages/DoctorAgendaPage';
 import NotFoundPage              from './pages/NotFoundPage';
 
 const RutaPrivada = () => {
@@ -44,9 +47,9 @@ const RutaDoctor = () => {
 const RutaPublica = ({ children }) => {
   const { usuario, esAdmin, esDoctor } = useAuth();
   if (usuario) {
-    if (esAdmin)  return <Navigate to="/admin/dashboard"    replace />;
-    if (esDoctor) return <Navigate to="/doctor/dashboard"   replace />;
-    return              <Navigate to="/mis-consultas"       replace />;
+    if (esAdmin)  return <Navigate to="/admin/dashboard"  replace />;
+    if (esDoctor) return <Navigate to="/doctor/dashboard" replace />;
+    return              <Navigate to="/mis-consultas"     replace />;
   }
   return children;
 };
@@ -56,22 +59,20 @@ function AppRoutes() {
     <>
       <Navbar />
       <Routes>
-        {/* Públicas */}
         <Route path="/"               element={<HomePage />} />
         <Route path="/inicio"         element={<HomePage />} />
         <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
         <Route path="/login"          element={<RutaPublica><LoginPage /></RutaPublica>} />
         <Route path="/registro"       element={<RutaPublica><RegistroPage /></RutaPublica>} />
 
-        {/* Paciente */}
         <Route element={<RutaPrivada />}>
           <Route path="/mis-consultas"       element={<MisConsultasPage />} />
           <Route path="/nueva-consulta"      element={<NuevaConsultaPage />} />
           <Route path="/editar-consulta/:id" element={<EditarConsultaPage />} />
+          <Route path="/reservar-hora"       element={<ReservarHoraPage />} />
           <Route path="/perfil"              element={<PerfilPage />} />
         </Route>
 
-        {/* Admin */}
         <Route element={<RutaAdmin />}>
           <Route path="/admin/dashboard"         element={<AdminDashboard />} />
           <Route path="/admin/consultas"         element={<AdminConsultasPage />} />
@@ -79,11 +80,12 @@ function AppRoutes() {
           <Route path="/admin/reasignacion"      element={<AdminReasignacionPage />} />
           <Route path="/admin/establecimientos"  element={<AdminEstablecimientosPage />} />
           <Route path="/admin/agenda"            element={<AdminAgendaPage />} />
+          <Route path="/admin/auditoria"         element={<AdminAuditoriaPage />} />
         </Route>
 
-        {/* Doctor */}
         <Route element={<RutaDoctor />}>
           <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+          <Route path="/doctor/agenda"    element={<DoctorAgendaPage />} />
           <Route path="/doctor/perfil"    element={<PerfilPage />} />
         </Route>
 

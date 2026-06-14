@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { crearConsulta } from '../service/api';
+import { crearConsulta, registrarAuditoria } from '../service/api';
 
 const ESPECIALIDADES = [
   'cardiologia','dermatologia','gastroenterologia','ginecologia',
@@ -28,6 +28,11 @@ export default function NuevaConsultaPage() {
         especialidad: form.especialidad,
         sintomas: form.sintomas,
       });
+      registrarAuditoria({
+        accion:'CREAR', modulo:'CONSULTAS', usuarioId: usuario?.id ? String(usuario.id) : 'PACIENTE',
+        usuarioRol:'PACIENTE', descripcion:`Nueva consulta de ${form.especialidad}`,
+        resultado:'EXITOSO',
+      }).catch(() => {});
       navigate('/mis-consultas');
     } catch {
       setError('Error al crear la consulta. Intenta de nuevo.');

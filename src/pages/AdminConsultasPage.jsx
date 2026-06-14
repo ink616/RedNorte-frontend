@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { listarTodasConsultas, actualizarConsultaAdmin, eliminarConsulta } from '../service/api';
+import { listarTodasConsultas, actualizarConsultaAdmin, eliminarConsulta, registrarAuditoria } from '../service/api';
 import Badge from '../components/Badge';
 
 const ESTADOS = ['PENDIENTE','AGENDADA','CANCELADA','REASIGNADA','ATENDIDA'];
@@ -40,6 +40,12 @@ export default function AdminConsultasPage() {
         fechaCita: formAdmin.fechaCita ? formAdmin.fechaCita + ':00' : null,
         notasAdmin: formAdmin.notasAdmin,
       });
+      registrarAuditoria({
+        accion:'ACTUALIZAR', modulo:'CONSULTAS', usuarioId:'ADMIN',
+        usuarioRol:'ADMIN', recursoId:String(editando),
+        descripcion:`Consulta #${editando} actualizada a estado ${formAdmin.estado}`,
+        resultado:'EXITOSO',
+      }).catch(() => {});
       setExito('✅ Consulta actualizada.'); setEditando(null); cargar();
     } catch { setError('Error al guardar.');
     } finally { setSaving(false); }
@@ -47,7 +53,15 @@ export default function AdminConsultasPage() {
 
   const handleEliminar = async (id) => {
     if (!window.confirm('¿Eliminar esta consulta?')) return;
-    try { await eliminarConsulta(id); cargar(); } catch { setError('Error al eliminar.'); }
+    try {
+      await eliminarConsulta(id);
+      registrarAuditoria({
+        accion:'ELIMINAR', modulo:'CONSULTAS', usuarioId:'ADMIN',
+        usuarioRol:'ADMIN', recursoId:String(id),
+        descripcion:`Consulta #${id} eliminada`, resultado:'EXITOSO',
+      }).catch(() => {});
+      cargar();
+    } catch { setError('Error al eliminar.'); }
   };
 
   return (

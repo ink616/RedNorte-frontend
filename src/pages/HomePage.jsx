@@ -47,7 +47,7 @@ export default function HomePage() {
   const { usuario } = useAuth();
 
   return (
-    <div style={{ background: 'var(--color-background-primary)' }}>
+    <div style={{ background: 'var(--card)' }}>
 
       {/* ── HERO ── */}
       <div style={{
@@ -119,36 +119,36 @@ export default function HomePage() {
       {/* ── ESPECIALIDADES ── */}
       <div style={{ padding: '5rem 2rem', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <span style={{ background: 'var(--color-background-secondary)', color: 'var(--primary)', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Nuestras especialidades</span>
-          <h2 style={{ fontSize: 32, fontWeight: 800, marginTop: 16, marginBottom: 8, color: 'var(--color-text-primary)' }}>Atención médica especializada</h2>
-          <p style={{ color: 'var(--color-text-secondary)', fontSize: 15, maxWidth: 500, margin: '0 auto' }}>Contamos con especialistas en múltiples áreas para brindarte la mejor atención.</p>
+          <span style={{ background: 'var(--bg-soft)', color: 'var(--primary)', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Nuestras especialidades</span>
+          <h2 style={{ fontSize: 32, fontWeight: 800, marginTop: 16, marginBottom: 8, color: 'var(--text)' }}>Atención médica especializada</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: 15, maxWidth: 500, margin: '0 auto' }}>Contamos con especialistas en múltiples áreas para brindarte la mejor atención.</p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
           {ESPECIALIDADES.map(e => (
             <div key={e.nombre} style={{
-              background: 'var(--color-background-primary)', border: '0.5px solid var(--color-border-tertiary)',
+              background: 'var(--card)', border: '0.5px solid var(--border)',
               borderRadius: 14, padding: '1.5rem', textAlign: 'center', cursor: 'default',
               transition: 'all 0.25s',
             }}
               onMouseEnter={el => { el.currentTarget.style.transform='translateY(-4px)'; el.currentTarget.style.boxShadow='0 12px 32px rgba(37,99,235,0.12)'; el.currentTarget.style.borderColor='#2563EB'; }}
-              onMouseLeave={el => { el.currentTarget.style.transform='translateY(0)'; el.currentTarget.style.boxShadow='none'; el.currentTarget.style.borderColor='var(--color-border-tertiary)'; }}
+              onMouseLeave={el => { el.currentTarget.style.transform='translateY(0)'; el.currentTarget.style.boxShadow='none'; el.currentTarget.style.borderColor='var(--border)'; }}
             >
               <div style={{ fontSize: 36, marginBottom: 10 }}>{e.icon}</div>
-              <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-text-primary)', marginBottom: 4 }}>{e.nombre}</div>
-              <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{e.desc}</div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', marginBottom: 4 }}>{e.nombre}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{e.desc}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* ── CÓMO FUNCIONA ── */}
-      <div style={{ background: 'var(--color-background-secondary)', padding: '5rem 2rem' }}>
+      <div style={{ background: 'var(--bg-soft)', padding: '5rem 2rem' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <span style={{ background: 'var(--color-background-primary)', color: 'var(--primary)', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Proceso simple</span>
-            <h2 style={{ fontSize: 32, fontWeight: 800, marginTop: 16, marginBottom: 8, color: 'var(--color-text-primary)' }}>¿Cómo funciona?</h2>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: 15 }}>En 4 pasos simples puedes tener tu consulta médica agendada.</p>
+            <span style={{ background: 'var(--card)', color: 'var(--primary)', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Proceso simple</span>
+            <h2 style={{ fontSize: 32, fontWeight: 800, marginTop: 16, marginBottom: 8, color: 'var(--text)' }}>¿Cómo funciona?</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>En 4 pasos simples puedes tener tu consulta médica agendada.</p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 24, position: 'relative' }}>
@@ -163,8 +163,8 @@ export default function HomePage() {
                   color: 'white', fontWeight: 800, fontSize: 18,
                   boxShadow: '0 4px 16px rgba(37,99,235,0.3)',
                 }}>{paso.num}</div>
-                <h3 style={{ fontWeight: 700, fontSize: 15, marginBottom: 8, color: 'var(--color-text-primary)' }}>{paso.titulo}</h3>
-                <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>{paso.desc}</p>
+                <h3 style={{ fontWeight: 700, fontSize: 15, marginBottom: 8, color: 'var(--text)' }}>{paso.titulo}</h3>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>{paso.desc}</p>
               </div>
             ))}
           </div>
@@ -175,11 +175,11 @@ export default function HomePage() {
       <div style={{ padding: '5rem 2rem', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' }}>
           <div>
-            <span style={{ background: 'var(--color-background-secondary)', color: 'var(--primary)', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Por qué elegirnos</span>
-            <h2 style={{ fontSize: 32, fontWeight: 800, marginTop: 16, marginBottom: 16, color: 'var(--color-text-primary)', lineHeight: 1.2 }}>
+            <span style={{ background: 'var(--bg-soft)', color: 'var(--primary)', borderRadius: 20, padding: '4px 16px', fontSize: 12, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Por qué elegirnos</span>
+            <h2 style={{ fontSize: 32, fontWeight: 800, marginTop: 16, marginBottom: 16, color: 'var(--text)', lineHeight: 1.2 }}>
               Una clínica diseñada para ti
             </h2>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: 15, lineHeight: 1.8, marginBottom: 28 }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.8, marginBottom: 28 }}>
               RedNorte nace para eliminar las barreras de acceso a la salud. Sin filas, sin esperas innecesarias, sin papeles.
             </p>
             {[
@@ -191,8 +191,8 @@ export default function HomePage() {
               <div key={titulo} style={{ display: 'flex', gap: 14, marginBottom: 18 }}>
                 <span style={{ fontSize: 22, flexShrink: 0 }}>{icon}</span>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-text-primary)', marginBottom: 2 }}>{titulo}</div>
-                  <div style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>{desc}</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', marginBottom: 2 }}>{titulo}</div>
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{desc}</div>
                 </div>
               </div>
             ))}
@@ -251,7 +251,7 @@ export default function HomePage() {
       )}
 
       {/* Footer */}
-      <div style={{ borderTop: '0.5px solid var(--color-border-tertiary)', padding: '2rem', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: 13 }}>
+      <div style={{ borderTop: '0.5px solid var(--border)', padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
         © 2026 RedNorte — Clínica Digital · Todos los derechos reservados
       </div>
     </div>

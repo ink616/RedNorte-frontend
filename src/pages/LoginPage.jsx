@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { login } from '../service/api';
+import { login, registrarAuditoria } from '../service/api';
 
 export default function LoginPage() {
-  const { iniciarSesion, esAdmin, esDoctor } = useAuth();
+  const { iniciarSesion } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ mail: '', pass: '' });
   const [error, setError] = useState('');
@@ -17,12 +17,27 @@ export default function LoginPage() {
     try {
       const data = await login(form.mail, form.pass);
       iniciarSesion(data);
-      // Redirigir según rol extraído del texto
-      const tag = data.match?.(/"tag":"([^"]+)"/)?.[1];
+
+      const tag = data?.rol?.tag;
+
+      registrarAuditoria({
+        accion: 'LOGIN', modulo: 'USUARIOS',
+        usuarioId: data?.id ? String(data.id) : form.mail,
+        usuarioRol: tag || 'DESCONOCIDO',
+        descripcion: `Inicio de sesion de ${form.mail}`,
+        resultado: 'EXITOSO',
+      }).catch(() => {});
+
       if (tag === 'ADMIN') navigate('/admin/dashboard');
       else if (tag === 'DOCTOR') navigate('/doctor/dashboard');
       else navigate('/mis-consultas');
     } catch {
+      registrarAuditoria({
+        accion: 'LOGIN', modulo: 'USUARIOS',
+        usuarioId: form.mail, usuarioRol: 'DESCONOCIDO',
+        descripcion: `Intento de login fallido: ${form.mail}`,
+        resultado: 'FALLIDO',
+      }).catch(() => {});
       setError('Correo o contraseña incorrectos. Intenta de nuevo.');
     } finally { setLoading(false); }
   };
@@ -101,16 +116,16 @@ export default function LoginPage() {
 
       {/* Panel derecho — formulario */}
       <div style={{
-        background: 'var(--color-background-primary)',
+        background: 'var(--bg)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         padding: '3rem',
       }}>
         <div style={{ width: '100%', maxWidth: 380 }}>
 
-          <h2 style={{ fontSize: 28, fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: 6 }}>
+          <h2 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text)', marginBottom: 6 }}>
             Bienvenido de vuelta
           </h2>
-          <p style={{ color: 'var(--color-text-secondary)', fontSize: 14, marginBottom: 32 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 32 }}>
             Inicia sesión para acceder a tu cuenta médica
           </p>
 
@@ -123,7 +138,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
             <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 8, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 8, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
                 Correo electrónico
               </label>
               <input
@@ -131,18 +146,18 @@ export default function LoginPage() {
                 placeholder="tu@correo.cl"
                 style={{
                   width: '100%', padding: '12px 16px', fontSize: 15, boxSizing: 'border-box',
-                  border: '1.5px solid var(--color-border-tertiary)', borderRadius: 10,
-                  background: 'var(--color-background-secondary)', color: 'var(--color-text-primary)',
+                  border: '1.5px solid var(--border)', borderRadius: 10,
+                  background: 'var(--bg-soft)', color: 'var(--text)',
                   outline: 'none', transition: 'border 0.2s',
                 }}
                 onFocus={e => e.target.style.borderColor = '#2563EB'}
-                onBlur={e => e.target.style.borderColor = 'var(--color-border-tertiary)'}
+                onBlur={e => e.target.style.borderColor = 'var(--border)'}
               />
             </div>
 
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-secondary)', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
                   Contraseña
                 </label>
               </div>
@@ -152,12 +167,12 @@ export default function LoginPage() {
                   placeholder="Tu contraseña"
                   style={{
                     width: '100%', padding: '12px 48px 12px 16px', fontSize: 15, boxSizing: 'border-box',
-                    border: '1.5px solid var(--color-border-tertiary)', borderRadius: 10,
-                    background: 'var(--color-background-secondary)', color: 'var(--color-text-primary)',
+                    border: '1.5px solid var(--border)', borderRadius: 10,
+                    background: 'var(--bg-soft)', color: 'var(--text)',
                     outline: 'none', transition: 'border 0.2s',
                   }}
                   onFocus={e => e.target.style.borderColor = '#2563EB'}
-                  onBlur={e => e.target.style.borderColor = 'var(--color-border-tertiary)'}
+                  onBlur={e => e.target.style.borderColor = 'var(--border)'}
                 />
                 <button type="button" onClick={() => setMostrarPass(!mostrarPass)} style={{
                   position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
@@ -176,15 +191,15 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div style={{ textAlign: 'center', marginTop: 24, fontSize: 14, color: 'var(--color-text-secondary)' }}>
+          <div style={{ textAlign: 'center', marginTop: 24, fontSize: 14, color: 'var(--text-muted)' }}>
             ¿No tienes cuenta?{' '}
             <Link to="/registro" style={{ color: '#2563EB', fontWeight: 700, textDecoration: 'none' }}>
               Regístrate gratis
             </Link>
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: 32, paddingTop: 24, borderTop: '0.5px solid var(--color-border-tertiary)' }}>
-            <Link to="/sobre-nosotros" style={{ color: 'var(--color-text-secondary)', fontSize: 13, textDecoration: 'none' }}>
+          <div style={{ textAlign: 'center', marginTop: 32, paddingTop: 24, borderTop: '0.5px solid var(--border)' }}>
+            <Link to="/sobre-nosotros" style={{ color: 'var(--text-muted)', fontSize: 13, textDecoration: 'none' }}>
               Conoce más sobre RedNorte →
             </Link>
           </div>

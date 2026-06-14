@@ -302,11 +302,11 @@ export default function AdminUsuariosPage() {
                   <td>{u.persona?`${u.persona.apellido1||''} ${u.persona.apellido2||''}`.trim():'—'}</td>
                   <td>{u.rol&&<Badge color="blue" texto={u.rol.tag}/>}</td>
                   <td><Badge color={u.estado==='ACTIVO'?'teal':'red'} texto={u.estado}/></td>
-                  <td style={{ fontSize:13, color:'var(--color-text-secondary)' }}>{u.fechaRegistro?new Date(u.fechaRegistro).toLocaleDateString('es-CL'):'—'}</td>
+                  <td style={{ fontSize:13, color:'var(--text-muted)' }}>{u.fechaRegistro?new Date(u.fechaRegistro).toLocaleDateString('es-CL'):'—'}</td>
                   <td style={{ textAlign:'center' }}><span style={{ fontSize:16, opacity:0.5 }}>👁️</span></td>
                 </tr>
               ))}
-              {filtrados.length===0&&<tr><td colSpan={7} style={{ textAlign:'center', padding:32, color:'var(--color-text-secondary)' }}>Sin resultados.</td></tr>}
+              {filtrados.length===0&&<tr><td colSpan={7} style={{ textAlign:'center', padding:32, color:'var(--text-muted)' }}>Sin resultados.</td></tr>}
             </tbody>
           </table>
         </div>
