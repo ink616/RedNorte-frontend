@@ -1,30 +1,29 @@
-:root {
-  /* 1. Azul Médico Tecnológico */
-  --primary-blue: #2563EB;
-  --primary-hover: #1D4ED8;
+/* ═══════════════════════════════════════════════════
+   css.css — RedNorte Clínica Digital
+   Estilos globales + todos los módulos
+   ═══════════════════════════════════════════════════ */
 
-  /* 2. Turquesa Moderno */
-  --secondary-teal: #0D9488;
+/* ─── Variables globales ─────────────────────────── */
+:root {
+  /* Azul Médico Tecnológico */
+  --primary-blue:    #2563EB;
+  --primary-hover:   #1D4ED8;
+
+  /* Turquesa Moderno */
+  --secondary-teal:  #0D9488;
   --secondary-hover: #0F766E;
 
-  /* 3. Fondos y Superficies */
+  /* Fondos y Superficies */
   --bg-global: #F9FAFB;
-  --bg-card: #FFFFFF;
+  --bg-card:   #FFFFFF;
 
-  /* 4. Tipografía */
-  --text-main: #1F2937;
+  /* Tipografía */
+  --text-main:      #1F2937;
   --text-secondary: #4B5563;
-  --text-white: #FFFFFF;
-
-  --primary-blue: #2563EB;   /* Azul Zafiro */
-  --primary-hover: #1D4ED8;
-  --secondary-teal: #0D9488; /* Turquesa */
-  --bg-global: #F9FAFB;
-  --bg-card: #FFFFFF;
-  --text-main: #1F2937;
-  --text-secondary: #4B5563;
+  --text-white:     #FFFFFF;
 }
 
+/* ─── Base ───────────────────────────────────────── */
 body {
   background-color: var(--bg-global);
   color: var(--text-main);
@@ -32,7 +31,7 @@ body {
   margin: 0;
 }
 
-/* --- Botones Globales --- */
+/* ─── Botones Globales ───────────────────────────── */
 .btn-primary {
   background-color: var(--primary-blue);
   color: var(--text-white);
@@ -63,4 +62,427 @@ body {
 .btn-outline-teal:hover {
   background-color: var(--secondary-teal);
   color: white;
+}
+
+/* ─── Sobre Nosotros ─────────────────────────────── */
+.nosotros-page {
+  padding-bottom: 60px;
+}
+
+.nosotros-hero {
+  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+  padding: 60px 5% 50px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.nosotros-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--secondary-teal);
+  margin-bottom: 14px;
+}
+
+.nosotros-hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.nosotros-hero h1 span {
+  color: var(--primary-blue);
+}
+
+.nosotros-hero p {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.nosotros-section {
+  padding: 48px 5%;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.nosotros-section:last-child {
+  border-bottom: none;
+}
+
+.nosotros-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.nosotros-section h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 28px;
+}
+
+/* Problemas */
+.nosotros-problemas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.nosotros-problema-item {
+  background-color: var(--bg-global);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1px solid #f1f5f9;
+}
+
+.nosotros-problema-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #E24B4A;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.nosotros-problema-item p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Módulos */
+.nosotros-modulos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+/* Stats */
+.nosotros-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 16px;
+}
+
+.nosotros-stat {
+  background-color: var(--bg-card);
+  border-radius: 14px;
+  padding: 24px 16px;
+  text-align: center;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.nosotros-stat-num {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-blue);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.nosotros-stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Fases */
+.nosotros-fase {
+  display: flex;
+  gap: 24px;
+  padding: 24px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.nosotros-fase:last-child {
+  border-bottom: none;
+}
+
+.nosotros-fase-num {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #e2e8f0;
+  flex-shrink: 0;
+  width: 52px;
+  line-height: 1;
+}
+
+.nosotros-fase-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.nosotros-fase-tag.parcial-1 { background-color: #dbeafe; color: #1e40af; }
+.nosotros-fase-tag.parcial-2 { background-color: #d1fae5; color: #065f46; }
+.nosotros-fase-tag.parcial-3 { background-color: #fef3c7; color: #92400e; }
+
+.nosotros-fase h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.nosotros-fase p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Tecnologías */
+.nosotros-tech-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nosotros-tech-pill {
+  background-color: var(--bg-card);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.nosotros-tech-pill:hover {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+/* Mapa */
+.nosotros-mapa {
+  width: 100%;
+  height: 300px;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  overflow: hidden;
+  display: block;
+}
+
+/* ─── Footer ─────────────────────────────────────── */
+.footer {
+  background: linear-gradient(90deg, #0f172a 0%, #1e3a8a 60%, #0f766e 100%);
+  color: rgba(255, 255, 255, 0.75);
+  padding: 48px 5% 24px;
+  margin-top: auto;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.footer-brand h3 {
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.footer-brand h3 span {
+  color: #5eead4;
+}
+
+.footer-brand p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.footer-col h4 {
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+}
+
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-col ul li {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-col ul li a {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-col ul li a:hover {
+  color: #5eead4;
+}
+
+.footer-col ul li span {
+  font-size: 15px;
+}
+
+.footer-emergency {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 8px;
+}
+
+.footer-emergency p {
+  font-size: 12px;
+  color: #fca5a5;
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.footer-emergency span {
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.footer-bottom p {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+}
+
+/* ─── Dark Mode ──────────────────────────────────── */
+html[data-theme="dark"] {
+  --primary-blue:    #3b82f6;
+  --primary-hover:   #2563eb;
+  --secondary-teal:  #14b8a6;
+  --secondary-hover: #0d9488;
+  --bg-global: #0f172a;
+  --bg-card:   #1e293b;
+  --text-main:      #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-white:     #ffffff;
+}
+
+html[data-theme="dark"] body {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+/* Fondos de cards y contenedores */
+html[data-theme="dark"] .login-box,
+html[data-theme="dark"] .register-card,
+html[data-theme="dark"] .universal-form-container,
+html[data-theme="dark"] .shortcut-card,
+html[data-theme="dark"] .nosotros-stat,
+html[data-theme="dark"] .nosotros-tech-pill,
+html[data-theme="dark"] .nosotros-problema-item,
+html[data-theme="dark"] .nosotros-modulo-card {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+/* Textos principales */
+html[data-theme="dark"] .shortcut-card h3,
+html[data-theme="dark"] .nosotros-hero h1,
+html[data-theme="dark"] .nosotros-section h2,
+html[data-theme="dark"] .nosotros-fase h3,
+html[data-theme="dark"] .login-header h2,
+html[data-theme="dark"] .register-header h2 {
+  color: #f1f5f9 !important;
+}
+
+/* Textos secundarios */
+html[data-theme="dark"] .shortcut-card p,
+html[data-theme="dark"] .nosotros-problema-item p,
+html[data-theme="dark"] .nosotros-fase p,
+html[data-theme="dark"] .nosotros-stat-label,
+html[data-theme="dark"] .nosotros-eyebrow,
+html[data-theme="dark"] .nosotros-section-label,
+html[data-theme="dark"] .nosotros-hero p {
+  color: #94a3b8 !important;
+}
+
+/* Hero nosotros */
+html[data-theme="dark"] .nosotros-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+/* Separadores */
+html[data-theme="dark"] .nosotros-section {
+  border-color: #1e293b !important;
+}
+
+html[data-theme="dark"] .nosotros-fase {
+  border-color: #334155 !important;
+}
+
+/* Hero home */
+html[data-theme="dark"] .hero-container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+html[data-theme="dark"] .hero-text h1 {
+  color: #f1f5f9 !important;
+}
+
+html[data-theme="dark"] .hero-text p {
+  color: #94a3b8 !important;
+}
+
+/* Inputs y formularios */
+html[data-theme="dark"] .form-group input,
+html[data-theme="dark"] .reg-group input,
+html[data-theme="dark"] .reg-select,
+html[data-theme="dark"] .form-select {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Botones outline */
+html[data-theme="dark"] .btn-outline-teal {
+  border-color: var(--secondary-teal);
+  color: var(--secondary-teal);
 }

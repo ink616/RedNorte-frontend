@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import './index.css';
 import Navbar                    from './components/Navbar';
+import Footer                    from './components/Footer';
 import HomePage                  from './pages/HomePage';
 import LoginPage                 from './pages/LoginPage';
 import RegistroPage              from './pages/RegistroPage';
@@ -88,6 +89,7 @@ function AppRoutes() {
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <Footer />
     </>
   );
 }
