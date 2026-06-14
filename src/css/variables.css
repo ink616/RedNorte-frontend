@@ -1,0 +1,105 @@
+/* ════════════════════════════════════════════════════════════
+   RedNorte — Sistema de Design Tokens
+   Paleta médica profesional · Modo claro + oscuro
+   ════════════════════════════════════════════════════════════ */
+:root {
+  /* ─── Marca ─────────────────────────────────────────────── */
+  --primary:        #2563EB;
+  --primary-dark:   #1D4ED8;
+  --primary-darker: #1E40AF;
+  --primary-light:  #EFF6FF;
+  --primary-glow:   rgba(37, 99, 235, 0.35);
+
+  --teal:           #0D9488;
+  --teal-dark:      #0F766E;
+  --teal-light:     #F0FDFA;
+  --teal-glow:      rgba(13, 148, 136, 0.3);
+
+  --accent:         #5EEAD4;
+
+  /* ─── Semánticos ────────────────────────────────────────── */
+  --success:        #10B981;
+  --success-dark:   #059669;
+  --success-light:  #D1FAE5;
+  --warning:        #F59E0B;
+  --warning-dark:   #D97706;
+  --warning-light:  #FEF3C7;
+  --danger:         #EF4444;
+  --danger-dark:    #DC2626;
+  --danger-light:   #FEE2E2;
+  --purple:         #7C3AED;
+  --purple-light:   #F5F3FF;
+
+  /* ─── Superficies ───────────────────────────────────────── */
+  --bg:             #F8FAFC;
+  --bg-soft:        #F1F5F9;
+  --card:           #FFFFFF;
+  --card-hover:     #FAFBFC;
+  --border:         #E5E7EB;
+  --border-soft:    #F1F3F5;
+
+  /* ─── Texto ─────────────────────────────────────────────── */
+  --text:           #0F172A;
+  --text-soft:      #475569;
+  --text-muted:     #94A3B8;
+
+  /* ─── Navegación ────────────────────────────────────────── */
+  --nav-grad:       linear-gradient(90deg, #0f172a 0%, #1e3a8a 60%, #0f766e 100%);
+
+  /* ─── Gradientes reutilizables ──────────────────────────── */
+  --grad-primary:   linear-gradient(135deg, #2563EB, #0D9488);
+  --grad-hero:      linear-gradient(135deg, #020617 0%, #0f172a 40%, #1e3a8a 75%, #0f766e 100%);
+  --grad-card:      linear-gradient(135deg, #2563EB, #0D9488);
+
+  /* ─── Geometría ─────────────────────────────────────────── */
+  --radius:         16px;
+  --radius-lg:      20px;
+  --radius-sm:      10px;
+  --radius-pill:    999px;
+
+  /* ─── Sombras (elevación) ───────────────────────────────── */
+  --shadow-xs:      0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow:         0 1px 3px rgba(15,23,42,0.06), 0 4px 16px rgba(15,23,42,0.05);
+  --shadow-md:      0 4px 12px rgba(15,23,42,0.08), 0 12px 32px rgba(15,23,42,0.06);
+  --shadow-lg:      0 12px 24px rgba(15,23,42,0.10), 0 24px 60px rgba(15,23,42,0.10);
+  --shadow-glow:    0 8px 28px rgba(37,99,235,0.28);
+
+  /* ─── Transiciones ──────────────────────────────────────── */
+  --transition:     all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast:all 0.15s ease;
+
+  /* ─── Alias de compatibilidad (nomenclatura larga) ──────── */
+  --color-background-primary:   var(--bg);
+  --color-background-secondary: var(--bg-soft);
+  --color-text-primary:         var(--text);
+  --color-text-secondary:       var(--text-soft);
+  --color-border-tertiary:      var(--border);
+}
+
+/* ════════════════════════════════════════════════════════════
+   MODO OSCURO
+   ════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --primary-light:  #1E3A5F;
+  --teal-light:     #134E4A;
+  --success-light:  #064E3B;
+  --warning-light:  #451A03;
+  --danger-light:   #450A0A;
+  --purple-light:   #2E1065;
+
+  --bg:             #0B1120;
+  --bg-soft:        #0F172A;
+  --card:           #1A2436;
+  --card-hover:     #212D42;
+  --border:         #2D3B53;
+  --border-soft:    #1F2A3D;
+
+  --text:           #F1F5F9;
+  --text-soft:      #A4B2C7;
+  --text-muted:     #64748B;
+
+  --shadow-xs:      0 1px 2px rgba(0,0,0,0.3);
+  --shadow:         0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
+  --shadow-md:      0 4px 12px rgba(0,0,0,0.45), 0 12px 32px rgba(0,0,0,0.35);
+  --shadow-lg:      0 12px 24px rgba(0,0,0,0.5), 0 24px 60px rgba(0,0,0,0.45);
+}

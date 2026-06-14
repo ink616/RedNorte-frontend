@@ -1,0 +1,51 @@
+/* ════════════════════════════════════════════════════════════
+   BOTONES
+   ════════════════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 11px 22px; border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; border: none; text-decoration: none;
+  transition: var(--transition); position: relative; overflow: hidden;
+  white-space: nowrap; user-select: none;
+}
+.btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(255,255,255,0.18); opacity: 0; transition: opacity 0.2s;
+}
+.btn:hover::after { opacity: 1; }
+.btn:hover  { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.btn:disabled::after { display: none; }
+
+.btn-primary {
+  background: var(--grad-primary); color: white;
+  box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+}
+.btn-primary:hover { box-shadow: 0 8px 22px rgba(37,99,235,0.4); }
+
+.btn-teal    { background: var(--teal); color: white; box-shadow: 0 4px 14px var(--teal-glow); }
+.btn-success { background: var(--success); color: white; box-shadow: 0 4px 14px rgba(16,185,129,0.3); }
+.btn-danger  { background: var(--danger); color: white; box-shadow: 0 4px 14px rgba(239,68,68,0.3); }
+.btn-warning { background: var(--warning); color: white; }
+
+.btn-soft-danger  { background: var(--danger-light);  color: var(--danger-dark); }
+.btn-soft-warning { background: var(--warning-light); color: var(--warning-dark); }
+
+.btn-ghost {
+  background: var(--bg-soft); color: var(--text-soft); border: 1px solid var(--border);
+}
+.btn-ghost:hover { background: var(--card); border-color: var(--primary); color: var(--primary); }
+
+.btn-outline {
+  background: transparent; border: 1.5px solid var(--primary); color: var(--primary);
+}
+.btn-outline:hover { background: var(--primary); color: white; }
+
+.btn-white { background: white; color: var(--primary-darker); box-shadow: var(--shadow-md); }
+
+.btn-sm   { padding: 7px 14px; font-size: 13px; }
+.btn-lg   { padding: 14px 32px; font-size: 16px; }
+.btn-full { width: 100%; }
+.btn-pill { border-radius: var(--radius-pill); }

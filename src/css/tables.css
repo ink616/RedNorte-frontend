@@ -1,0 +1,24 @@
+/* ════════════════════════════════════════════════════════════
+   TABLAS
+   ════════════════════════════════════════════════════════════ */
+.tabla { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+.tabla th {
+  padding: 13px 18px; text-align: left;
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.7px;
+  background: var(--bg-soft); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0;
+}
+.tabla td {
+  padding: 14px 18px; border-bottom: 1px solid var(--border-soft);
+  vertical-align: middle; color: var(--text);
+}
+.tabla tbody tr { transition: background 0.15s; }
+.tabla tbody tr:last-child td { border-bottom: none; }
+.tabla tbody tr:hover td { background: var(--primary-light); }
+
+.tabla-id { font-weight: 700; color: var(--text-muted); font-size: 13px; }
+
+/* contenedor con scroll horizontal en móvil */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
