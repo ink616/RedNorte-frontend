@@ -33,6 +33,7 @@ export default function Navbar() {
 
   const ADMIN_LINKS = [
     { to: '/admin/dashboard',        label: 'Dashboard' },
+    { to: '/admin/estadisticas',     label: 'Reportes' },
     { to: '/admin/consultas',        label: 'Consultas' },
     { to: '/admin/usuarios',         label: 'Usuarios' },
     { to: '/admin/establecimientos', label: 'Centros' },

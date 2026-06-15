@@ -21,6 +21,7 @@ import AdminReasignacionPage     from './pages/AdminReasignacionPage';
 import AdminEstablecimientosPage from './pages/AdminEstablecimientosPage';
 import AdminAgendaPage           from './pages/AdminAgendaPage';
 import AdminAuditoriaPage        from './pages/AdminAuditoriaPage';
+import AdminEstadisticasPage     from './pages/AdminEstadisticasPage';
 import DoctorDashboard           from './pages/DoctorDashboard';
 import DoctorAgendaPage          from './pages/DoctorAgendaPage';
 import NotFoundPage              from './pages/NotFoundPage';
@@ -81,6 +82,7 @@ function AppRoutes() {
           <Route path="/admin/establecimientos"  element={<AdminEstablecimientosPage />} />
           <Route path="/admin/agenda"            element={<AdminAgendaPage />} />
           <Route path="/admin/auditoria"         element={<AdminAuditoriaPage />} />
+          <Route path="/admin/estadisticas"      element={<AdminEstadisticasPage />} />
         </Route>
 
         <Route element={<RutaDoctor />}>
