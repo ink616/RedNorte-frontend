@@ -51,7 +51,7 @@ export default function LoginPage() {
   ];
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '100vh' }}>
+    <div className="login-split">
 
       {/* Panel izquierdo — visual */}
       <div style={{
@@ -129,11 +129,7 @@ export default function LoginPage() {
             Inicia sesión para acceder a tu cuenta médica
           </p>
 
-          {error && (
-            <div style={{ background: '#FCEBEB', color: '#A32D2D', borderRadius: 10, padding: '12px 16px', fontSize: 13, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
-              ⚠️ {error}
-            </div>
-          )}
+          {error && <div className="alert alert-error" style={{ marginBottom: 20 }}>⚠️ {error}</div>}
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 

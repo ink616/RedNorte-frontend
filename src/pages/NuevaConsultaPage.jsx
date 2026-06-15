@@ -40,8 +40,13 @@ export default function NuevaConsultaPage() {
   };
 
   return (
-    <div className="page" style={{ maxWidth: 640 }}>
-      <h2 className="page-title">📋 Nueva consulta médica</h2>
+    <div className="page page-narrow">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">📝 Nueva consulta médica</h1>
+          <p className="page-subtitle">CuÃ©ntanos quÃ© necesitas y te asignaremos un especialista</p>
+        </div>
+      </div>
 
       <div className="card">
         {error && <div className="alert alert-error">⚠️ {error}</div>}
@@ -54,7 +59,7 @@ export default function NuevaConsultaPage() {
             <label>Tu nombre completo</label>
             <input className="form-control" value={form.nombrePaciente}
               onChange={e => setForm({ ...form, nombrePaciente: e.target.value })}
-              placeholder="Ej: Juan Pérez González" required />
+              placeholder="Ej: Juan PÃ©rez GonzÃ¡lez" required />
           </div>
 
           <div className="form-group">
@@ -74,8 +79,9 @@ export default function NuevaConsultaPage() {
             <label>Descripción de síntomas</label>
             <textarea className="form-control" value={form.sintomas}
               onChange={e => setForm({ ...form, sintomas: e.target.value })}
-              placeholder="Describe detalladamente tus síntomas..."
-              style={{ minHeight: 120 }} required />
+              placeholder="Describe detalladamente tus sÃ­ntomas, desde cuÃ¡ndo los tienes y su intensidad..."
+              style={{ minHeight: 130 }} required />
+            <p className="form-hint">Mientras mÃ¡s detalles, mejor podremos orientar tu atenciÃ³n.</p>
           </div>
 
           <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>

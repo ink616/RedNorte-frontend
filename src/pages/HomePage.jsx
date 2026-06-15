@@ -250,10 +250,6 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Footer */}
-      <div style={{ borderTop: '0.5px solid var(--border)', padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-        © 2026 RedNorte — Clínica Digital · Todos los derechos reservados
-      </div>
     </div>
   );
 }

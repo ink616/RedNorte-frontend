@@ -117,3 +117,12 @@
 }
 .login-card h1   { font-size: 28px; color: var(--text); margin-bottom: 6px; }
 .login-card .sub { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
+
+
+/* â”€â”€â”€ LOGIN SPLIT (responsivo) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.login-split { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+.login-split > div:first-child { min-width: 0; }
+@media (max-width: 860px) {
+  .login-split { grid-template-columns: 1fr; }
+  .login-split > div:first-child { display: none !important; }
+}
