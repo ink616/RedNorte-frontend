@@ -1,0 +1,128 @@
+/* ════════════════════════════════════════════════════════════
+   CARDS
+   ════════════════════════════════════════════════════════════ */
+.card {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 24px; border: 1px solid var(--border);
+  transition: var(--transition);
+}
+.card-pad-0 { padding: 0; overflow: hidden; }
+.card-hover:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+
+.card-header {
+  padding: 16px 22px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  font-weight: 700; font-size: 15px; color: var(--text);
+}
+
+/* ─── STAT CARD ──────────────────────────────────────────── */
+.stat-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 22px 24px; border: 1px solid var(--border);
+  box-shadow: var(--shadow); transition: var(--transition);
+  display: flex; align-items: center; gap: 16px; position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: var(--accent-color, var(--primary));
+}
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.stat-icon {
+  width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+}
+.stat-num   { font-size: 28px; font-weight: 800; font-family: 'Sora', sans-serif; line-height: 1; }
+.stat-label { font-size: 13px; color: var(--text-muted); margin-top: 5px; font-weight: 500; }
+
+/* ─── SHORTCUT CARD ──────────────────────────────────────── */
+.shortcut-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 24px 18px; text-align: center; text-decoration: none;
+  border: 1.5px solid var(--border); box-shadow: var(--shadow);
+  transition: var(--transition); display: block; color: var(--text);
+  position: relative; overflow: hidden;
+}
+.shortcut-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--grad-primary); opacity: 0; transition: opacity 0.25s; z-index: 0;
+}
+.shortcut-card > * { position: relative; z-index: 1; transition: color 0.25s; }
+.shortcut-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: transparent; }
+.shortcut-card:hover::before { opacity: 1; }
+.shortcut-card:hover .icon,
+.shortcut-card:hover h3,
+.shortcut-card:hover p { color: white; }
+.shortcut-card .icon { font-size: 30px; margin-bottom: 10px; display: block; }
+.shortcut-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.shortcut-card p  { font-size: 12.5px; color: var(--text-muted); }
+
+/* ─── PROGRESS / distribución de estados ─────────────────── */
+.dist-bar { display: flex; gap: 10px; flex-wrap: wrap; }
+.dist-item {
+  flex: 1; min-width: 110px; border-radius: var(--radius-sm);
+  padding: 14px 16px; text-align: center;
+}
+.dist-num { font-size: 22px; font-weight: 800; }
+.dist-label { font-size: 11px; font-weight: 700; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+.dist-pct { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+
+/* ════════════════════════════════════════════════════════════
+   MODAL
+   ════════════════════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(8, 13, 28, 0.62);
+  backdrop-filter: blur(4px); z-index: 1000;
+  display: flex; align-items: center; justify-content: center; padding: 18px;
+  animation: fadeIn 0.2s ease;
+}
+.modal {
+  background: var(--card); border-radius: var(--radius-lg);
+  width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto;
+  box-shadow: var(--shadow-lg); animation: scaleIn 0.25s cubic-bezier(0.4,0,0.2,1);
+  border: 1px solid var(--border);
+}
+.modal-header {
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.modal-header h2 { font-size: 18px; font-weight: 800; color: var(--text); margin: 0; }
+.modal-close {
+  background: var(--bg-soft); border: none; width: 34px; height: 34px; border-radius: 10px;
+  font-size: 16px; cursor: pointer; color: var(--text-muted); transition: var(--transition);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: var(--danger-light); color: var(--danger); }
+.modal-body { padding: 24px; }
+.modal-footer { display: flex; gap: 10px; padding: 0 24px 24px; }
+
+/* ─── HERO (legacy, usado por algunos) ───────────────────── */
+.hero {
+  background: var(--grad-hero); color: white;
+  padding: 64px 5%; text-align: center;
+}
+.hero h1 { font-size: 44px; margin-bottom: 16px; }
+.hero p  { font-size: 18px; opacity: 0.9; max-width: 560px; margin: 0 auto 32px; }
+
+/* ─── LOGIN ──────────────────────────────────────────────── */
+.login-page {
+  min-height: calc(100vh - 66px); display: flex; align-items: center; justify-content: center;
+  background: var(--grad-hero); padding: 24px; position: relative; overflow: hidden;
+}
+.login-card {
+  background: var(--card); border-radius: var(--radius-lg);
+  padding: 44px; width: 100%; max-width: 430px;
+  box-shadow: var(--shadow-lg); position: relative; z-index: 2;
+  animation: scaleIn 0.4s cubic-bezier(0.4,0,0.2,1);
+  border: 1px solid var(--border);
+}
+.login-card h1   { font-size: 28px; color: var(--text); margin-bottom: 6px; }
+.login-card .sub { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
+
+
+/* â”€â”€â”€ LOGIN SPLIT (responsivo) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.login-split { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+.login-split > div:first-child { min-width: 0; }
+@media (max-width: 860px) {
+  .login-split { grid-template-columns: 1fr; }
+  .login-split > div:first-child { display: none !important; }
+}

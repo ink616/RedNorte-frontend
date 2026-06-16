@@ -1,22 +1,8 @@
 import axios from 'axios';
 
-// ─── URLs desde variables de entorno ─────────────────
-const MS_USUARIOS     = process.env.REACT_APP_MS_USUARIOS;
-const MS_CONSULTAS    = process.env.REACT_APP_MS_CONSULTAS;
-const MS_REASIGNACION = process.env.REACT_APP_MS_REASIGNACION;
-const MS_FICHA        = process.env.REACT_APP_MS_FICHA;
+const GW = process.env.REACT_APP_API_GATEWAY || 'http://localhost:8090';
 
-// ─── Interceptor JWT ──────────────────────────────────
-// Agrega el token automáticamente a TODAS las peticiones
-axios.interceptors.request.use(config => {
-  const token = localStorage.getItem('rednorte_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Si el backend responde 401, limpiar sesión y redirigir al login
+// ─── INTERCEPTOR 401 ─────────────────────────────────────────────────────────
 axios.interceptors.response.use(
   response => response,
   error => {
@@ -29,119 +15,157 @@ axios.interceptors.response.use(
   }
 );
 
-// ─── AUTH ─────────────────────────────────────────────
-export const login = async (correo, contrasena) => {
-  const res = await axios.post(`${MS_USUARIOS}/auth/login`, { correo, contrasena });
-  const { token, ...usuario } = res.data;
-  if (token) {
-    localStorage.setItem('rednorte_token', token);
-  }
-  return usuario;
-};
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+export const login = (mail, pass) =>
+  axios.post(`${GW}/usuarios/login`, { mail, pass }).then(r => r.data);
 
-// ─── USUARIOS ─────────────────────────────────────────
+// ─── USUARIOS ─────────────────────────────────────────────────────────────────
 export const registrarUsuario = (datos) =>
-  axios.post(`${MS_USUARIOS}/usuarios/registrar`, datos).then(r => r.data);
+  axios.post(`${GW}/usuarios`, datos).then(r => r.data);
 
 export const listarUsuarios = () =>
-  axios.get(`${MS_USUARIOS}/usuarios`).then(r => r.data);
+  axios.get(`${GW}/usuarios`).then(r => r.data);
 
 export const crearUsuario = (datos) =>
-  axios.post(`${MS_USUARIOS}/usuarios`, datos).then(r => r.data);
+  axios.post(`${GW}/usuarios`, datos).then(r => r.data);
 
 export const actualizarUsuario = (id, datos) =>
-  axios.put(`${MS_USUARIOS}/usuarios/${id}`, datos).then(r => r.data);
+  axios.put(`${GW}/usuarios/${id}`, datos).then(r => r.data);
 
 export const eliminarUsuario = (id) =>
-  axios.delete(`${MS_USUARIOS}/usuarios/${id}`).then(r => r.data);
+  axios.delete(`${GW}/usuarios/${id}`).then(r => r.data);
 
 export const listarRoles = () =>
-  axios.get(`${MS_USUARIOS}/roles`).then(r => r.data);
+  axios.get(`${GW}/roles`).then(r => r.data);
 
-export const crearRol = (datos) =>
-  axios.post(`${MS_USUARIOS}/roles`, datos).then(r => r.data);
+export const crearRol = (rol) =>
+  axios.post(`${GW}/roles`, rol).then(r => r.data);
 
-// ─── CONSULTAS ────────────────────────────────────────
-export const crearConsulta = (datos) =>
-  axios.post(`${MS_CONSULTAS}/consultas`, datos).then(r => r.data);
+// ─── CONSULTAS ────────────────────────────────────────────────────────────────
+export const crearConsulta = (dto) =>
+  axios.post(`${GW}/consultas`, dto).then(r => r.data);
 
 export const listarTodasConsultas = () =>
-  axios.get(`${MS_CONSULTAS}/consultas`).then(r => r.data);
+  axios.get(`${GW}/consultas`).then(r => r.data);
 
-export const listarConsultasPorUsuario = (usuarioId) =>
-  axios.get(`${MS_CONSULTAS}/consultas/usuario/${usuarioId}`).then(r => r.data);
+export const listarConsultasPorUsuario = (id) =>
+  axios.get(`${GW}/consultas/usuario/${id}`).then(r => r.data);
 
 export const obtenerConsulta = (id) =>
-  axios.get(`${MS_CONSULTAS}/consultas/${id}`).then(r => r.data);
+  axios.get(`${GW}/consultas/${id}`).then(r => r.data);
 
-export const editarConsultaPaciente = (id, datos) =>
-  axios.put(`${MS_CONSULTAS}/consultas/${id}`, datos).then(r => r.data);
+export const editarConsultaPaciente = (id, dto) =>
+  axios.put(`${GW}/consultas/${id}/paciente`, dto).then(r => r.data);
 
-export const actualizarConsultaAdmin = (id, datos) =>
-  axios.put(`${MS_CONSULTAS}/consultas/admin/${id}`, datos).then(r => r.data);
+export const actualizarConsultaAdmin = (id, dto) =>
+  axios.put(`${GW}/consultas/${id}/admin`, dto).then(r => r.data);
 
 export const eliminarConsulta = (id) =>
-  axios.delete(`${MS_CONSULTAS}/consultas/${id}`).then(r => r.data);
+  axios.delete(`${GW}/consultas/${id}`);
 
-// ─── FICHA MÉDICA ─────────────────────────────────────
-export const obtenerFicha = (usuarioId) =>
-  axios.get(`${MS_FICHA}/fichas/${usuarioId}`).then(r => r.data);
+// ─── REASIGNACIÓN ─────────────────────────────────────────────────────────────
+export const cancelarYReasignar = (bloqueId, motivo) =>
+  axios.post(`${GW}/api/reasignacion/cancelar-y-reasignar/${bloqueId}?motivo=${encodeURIComponent(motivo)}`).then(r => r.data);
 
-export const guardarFicha = (datos) =>
-  axios.post(`${MS_FICHA}/fichas`, datos).then(r => r.data);
-
-// ─── REASIGNACIÓN / BLOQUES ───────────────────────────
-export const cancelarYReasignar = (datos) =>
-  axios.post(`${MS_REASIGNACION}/reasignacion/cancelar`, datos).then(r => r.data);
+export const soloCancelar = (bloqueId, motivo) =>
+  axios.post(`${GW}/api/reasignacion/solo-cancelar/${bloqueId}?motivo=${encodeURIComponent(motivo)}`).then(r => r.data);
 
 export const listarBloques = () =>
-  axios.get(`${MS_REASIGNACION}/api/bloques`).then(r => r.data);
+  axios.get(`${GW}/api/bloques`).then(r => r.data);
 
 export const listarBloquesPorEspecialidad = (especialidadId) =>
-  axios.get(`${MS_REASIGNACION}/api/bloques/especialidad/${especialidadId}`).then(r => r.data);
-
-export const reservarBloque = (id, pacienteId, consultaId) =>
-  axios.put(`${MS_AGENDA}/agenda/${id}/reservar`, { pacienteId, consultaId }).then(r => r.data);
+  axios.get(`${GW}/api/bloques/especialidad/${especialidadId}`).then(r => r.data);
 
 export const crearBloque = (bloque) =>
-  axios.post(`${MS_REASIGNACION}/api/bloques`, bloque).then(r => r.data);
-// ─── AGENDA MÉDICA (ms-agenda-medica puerto 8094) ─
-const MS_AGENDA = process.env.REACT_APP_MS_AGENDA;
+  axios.post(`${GW}/api/bloques`, bloque).then(r => r.data);
 
-export const listarBloquesDisponibles = (fecha) =>
-  axios.get(`${MS_AGENDA}/agenda/disponibles/${fecha}`).then(r => r.data);
+// ─── FICHA MÉDICA ─────────────────────────────────────────────────────────────
+export const obtenerFicha = (usuarioId) =>
+  axios.get(`${GW}/ficha/${usuarioId}`).then(r => r.data).catch(() => null);
 
-export const listarBloquesPorDoctor = (doctorId) =>
-  axios.get(`${MS_AGENDA}/agenda/doctor/${doctorId}`).then(r => r.data);
+export const guardarFicha = (usuarioId, datos) =>
+  axios.put(`${GW}/ficha/${usuarioId}`, datos).then(r => r.data);
 
-export const listarCitasPaciente = (pacienteId) =>
-  axios.get(`${MS_AGENDA}/agenda/paciente/${pacienteId}`).then(r => r.data);
-
-export const cancelarBloque = (id) =>
-  axios.put(`${MS_AGENDA}/agenda/${id}/cancelar`).then(r => r.data);
-
-export const generarBloques = (doctorId, establecimientoId, fecha) =>
-  axios.post(`${MS_AGENDA}/agenda/generar`, { doctorId, establecimientoId, fecha }).then(r => r.data);
-const MS_NOTIF = process.env.REACT_APP_MS_NOTIFICACIONES;
-
-// ─── NOTIFICACIONES ───────────────────────────────
-export const contarNoLeidas = (usuarioId) =>
-  axios.get(`${MS_NOTIF}/notificaciones/usuario/${usuarioId}/contador`).then(r => r.data);
+// ─── NOTIFICACIONES ───────────────────────────────────────────────────────────
+export const listarNotificaciones = (usuarioId) =>
+  axios.get(`${GW}/notificaciones/usuario/${usuarioId}`).then(r => r.data);
 
 export const listarNoLeidas = (usuarioId) =>
-  axios.get(`${MS_NOTIF}/notificaciones/usuario/${usuarioId}/no-leidas`).then(r => r.data);
+  axios.get(`${GW}/notificaciones/usuario/${usuarioId}/no-leidas`).then(r => r.data);
 
-export const listarNotificaciones = (usuarioId) =>
-  axios.get(`${MS_NOTIF}/notificaciones/usuario/${usuarioId}`).then(r => r.data);
+export const contarNoLeidas = (usuarioId) =>
+  axios.get(`${GW}/notificaciones/usuario/${usuarioId}/contador`).then(r => r.data);
 
-export const marcarLeida = (id) =>
-  axios.put(`${MS_NOTIF}/notificaciones/${id}/leer`).then(r => r.data);
+export const marcarLeida = (notifId) =>
+  axios.put(`${GW}/notificaciones/${notifId}/leer`).then(r => r.data);
 
 export const marcarTodasLeidas = (usuarioId) =>
-  axios.put(`${MS_NOTIF}/notificaciones/usuario/${usuarioId}/leer-todas`).then(r => r.data);
+  axios.put(`${GW}/notificaciones/usuario/${usuarioId}/leer-todas`).then(r => r.data);
 
 export const notificarCambioEstado = (usuarioId, consultaId, estadoAnterior, estadoNuevo) =>
-  axios.post(`${MS_NOTIF}/notificaciones/cambio-estado`, {
-    usuarioId, consultaId, estadoAnterior, estadoNuevo
+  axios.post(`${GW}/notificaciones/cambio-estado`, {
+    usuarioId, consultaId, estadoAnterior, estadoNuevo,
   }).then(r => r.data);
-  
+
+// ─── ESTABLECIMIENTOS ─────────────────────────────────────────────────────────
+export const listarEstablecimientos = () =>
+  axios.get(`${GW}/establecimientos`).then(r => r.data);
+
+export const obtenerEstablecimiento = (id) =>
+  axios.get(`${GW}/establecimientos/${id}`).then(r => r.data);
+
+export const crearEstablecimiento = (dto) =>
+  axios.post(`${GW}/establecimientos`, dto).then(r => r.data);
+
+export const actualizarEstablecimiento = (id, dto) =>
+  axios.put(`${GW}/establecimientos/${id}`, dto).then(r => r.data);
+
+export const eliminarEstablecimiento = (id) =>
+  axios.delete(`${GW}/establecimientos/${id}`);
+
+// ─── AGENDA MÉDICA ────────────────────────────────────────────────────────────
+export const listarAgenda = () =>
+  axios.get(`${GW}/agenda`).then(r => r.data);
+
+export const agendaPorDoctor = (doctorId) =>
+  axios.get(`${GW}/agenda/doctor/${doctorId}`).then(r => r.data);
+
+export const agendaDisponiblePorFecha = (fecha) =>
+  axios.get(`${GW}/agenda/disponibles/${fecha}`).then(r => r.data);
+
+export const agendaPorPaciente = (pacienteId) =>
+  axios.get(`${GW}/agenda/paciente/${pacienteId}`).then(r => r.data);
+
+export const generarBloques = (doctorId, establecimientoId, fecha) =>
+  axios.post(`${GW}/agenda/generar`, { doctorId, establecimientoId, fecha }).then(r => r.data);
+
+export const reservarBloque = (id, pacienteId, consultaId) =>
+  axios.put(`${GW}/agenda/${id}/reservar`, { pacienteId, consultaId }).then(r => r.data);
+
+export const cancelarBloque = (id) =>
+  axios.put(`${GW}/agenda/${id}/cancelar`).then(r => r.data);
+
+// ─── ESTADÍSTICAS ─────────────────────────────────────────────────────────────
+export const obtenerResumenEstadisticas = () =>
+  axios.get(`${GW}/estadisticas/resumen`).then(r => r.data);
+
+export const estadisticasConsultas = () =>
+  axios.get(`${GW}/estadisticas/consultas`).then(r => r.data);
+
+export const estadisticasAgenda = () =>
+  axios.get(`${GW}/estadisticas/agenda`).then(r => r.data);
+
+// ─── AUDITORÍA ────────────────────────────────────────────────────────────────
+export const registrarAuditoria = (dto) =>
+  axios.post(`${GW}/auditoria`, dto).then(r => r.data);
+
+export const listarAuditoria = () =>
+  axios.get(`${GW}/auditoria`).then(r => r.data);
+
+export const auditoriaPorUsuario = (usuarioId) =>
+  axios.get(`${GW}/auditoria/usuario/${usuarioId}`).then(r => r.data);
+
+// ─── ALIASES DE COMPATIBILIDAD ───────────────────────────────────────────────
+export const listarBloquesDisponibles = agendaDisponiblePorFecha;
+export const listarBloquesPorDoctor   = agendaPorDoctor;
+export const listarCitasPaciente      = agendaPorPaciente;

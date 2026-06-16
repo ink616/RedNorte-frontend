@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { listarTodasConsultas, actualizarConsultaAdmin, notificarCambioEstado } from '../service/api';
+import { listarTodasConsultas, actualizarConsultaAdmin, notificarCambioEstado, registrarAuditoria } from '../service/api';
 
 const ESTADOS = ['PENDIENTE', 'AGENDADA', 'ATENDIDA', 'CANCELADA'];
+
 export default function DoctorDashboard() {
   const { usuario } = useAuth();
   const [consultas, setConsultas]           = useState([]);
@@ -14,22 +16,19 @@ export default function DoctorDashboard() {
   const [guardando, setGuardando]           = useState(false);
   const [exito, setExito]                   = useState('');
 
-  const p        = usuario?.persona;
-  const nombre   = p ? `Dr. ${p.apellido1} ${p.apellido2 || ''}`.trim() : 'Doctor';
+  const p         = usuario?.persona;
+  const nombre    = p ? `Dr. ${p.apellido1} ${p.apellido2 || ''}`.trim() : 'Doctor';
   const iniciales = p ? (p.apellido1?.[0] || '') + (p.apellido2?.[0] || '') : 'DR';
 
   const cargar = () => {
     setLoading(true);
     listarTodasConsultas()
-      .then(data => setConsultas(Array.isArray(data) ? data : []))
+      .then(d => setConsultas(Array.isArray(d) ? d : []))
       .finally(() => setLoading(false));
   };
-
   useEffect(() => { cargar(); }, []);
 
-  const consultasFiltradas = filtro === 'TODAS'
-    ? consultas
-    : consultas.filter(c => c.estado === filtro);
+  const filtradas = filtro === 'TODAS' ? consultas : consultas.filter(c => c.estado === filtro);
 
   const stats = {
     total:      consultas.length,
@@ -38,7 +37,7 @@ export default function DoctorDashboard() {
     atendidas:  consultas.filter(c => c.estado === 'ATENDIDA').length,
   };
 
-  const handleActualizar = async () => {
+  const actualizar = async () => {
     if (!nuevoEstado) return;
     setGuardando(true);
     try {
@@ -52,6 +51,13 @@ export default function DoctorDashboard() {
         consultaActiva.estado,
         nuevoEstado
       ).catch(() => {});
+      registrarAuditoria({
+        accion: 'ACTUALIZAR', modulo: 'CONSULTAS',
+        usuarioId: usuario?.id ? String(usuario.id) : 'DOCTOR',
+        usuarioRol: 'DOCTOR', recursoId: String(consultaActiva.id),
+        descripcion: `Doctor actualizó consulta #${consultaActiva.id} a ${nuevoEstado}`,
+        resultado: 'EXITOSO',
+      }).catch(() => {});
       setExito('Estado actualizado correctamente.');
       setConsultaActiva(null);
       cargar();
@@ -76,6 +82,7 @@ export default function DoctorDashboard() {
         <div className="doctor-header-total">
           <div className="doctor-header-total-num">{stats.total}</div>
           <div className="doctor-header-total-label">Consultas totales</div>
+          <Link to="/doctor/agenda" className="doctor-header-agenda-link">Ver mi agenda →</Link>
         </div>
       </div>
 
@@ -111,7 +118,7 @@ export default function DoctorDashboard() {
           <button
             key={e}
             onClick={() => setFiltro(e)}
-            className={`doctor-filtro-btn ${filtro === e ? 'activo' : ''}`}
+            className={`doctor-filtro-btn${filtro === e ? ' activo' : ''}`}
           >
             {e}
           </button>
@@ -131,10 +138,10 @@ export default function DoctorDashboard() {
               </tr>
             </thead>
             <tbody>
-              {consultasFiltradas.length === 0 ? (
+              {filtradas.length === 0 ? (
                 <tr><td colSpan={7} className="doctor-tabla-vacia">Sin consultas.</td></tr>
               ) : (
-                consultasFiltradas.map(c => (
+                filtradas.map(c => (
                   <tr key={c.id}>
                     <td><strong>#{c.id}</strong></td>
                     <td>{c.nombrePaciente || '—'}</td>
@@ -143,7 +150,9 @@ export default function DoctorDashboard() {
                       {c.sintomas?.slice(0, 60)}{c.sintomas?.length > 60 ? '...' : ''}
                     </td>
                     <td>
-                      <span className={`badge-estado badge-estado-${c.estado?.toLowerCase()}`}>{c.estado}</span>
+                      <span className={`badge-estado badge-estado-${c.estado?.toLowerCase()}`}>
+                        {c.estado}
+                      </span>
                     </td>
                     <td className="doctor-td-fecha">
                       {c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleDateString('es-CL') : '—'}
@@ -151,7 +160,11 @@ export default function DoctorDashboard() {
                     <td>
                       <button
                         className="btn-outline-teal btn-sm"
-                        onClick={() => { setConsultaActiva(c); setNuevoEstado(c.estado); setNotas(c.notasAdmin || ''); }}
+                        onClick={() => {
+                          setConsultaActiva(c);
+                          setNuevoEstado(c.estado);
+                          setNotas(c.notasAdmin || '');
+                        }}
                       >
                         Actualizar
                       </button>
@@ -169,7 +182,9 @@ export default function DoctorDashboard() {
         <div className="modal-overlay">
           <div className="modal-card">
             <h3 className="modal-titulo">Actualizar consulta #{consultaActiva.id}</h3>
-            <p className="modal-subtitulo">{consultaActiva.nombrePaciente} — {consultaActiva.especialidad}</p>
+            <p className="modal-subtitulo">
+              {consultaActiva.nombrePaciente} — {consultaActiva.especialidad}
+            </p>
 
             <div className="modal-sintomas">
               <div className="modal-sintomas-label">Síntomas del paciente</div>
@@ -178,22 +193,33 @@ export default function DoctorDashboard() {
 
             <div className="form-group">
               <label>Nuevo estado</label>
-              <select className="form-control" value={nuevoEstado} onChange={e => setNuevoEstado(e.target.value)}>
+              <select
+                className="form-control"
+                value={nuevoEstado}
+                onChange={e => setNuevoEstado(e.target.value)}
+              >
                 {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
               </select>
             </div>
 
             <div className="form-group">
               <label>Notas médicas</label>
-              <textarea className="form-control" value={notas} onChange={e => setNotas(e.target.value)}
-                placeholder="Observaciones, indicaciones, próximos pasos..." rows={4} />
+              <textarea
+                className="form-control"
+                value={notas}
+                onChange={e => setNotas(e.target.value)}
+                placeholder="Observaciones, indicaciones, próximos pasos..."
+                rows={4}
+              />
             </div>
 
             <div className="modal-btns">
-              <button onClick={handleActualizar} disabled={guardando} className="btn-primary">
+              <button onClick={actualizar} disabled={guardando} className="btn-primary">
                 {guardando ? 'Guardando...' : '💾 Guardar cambios'}
               </button>
-              <button onClick={() => setConsultaActiva(null)} className="btn-outline-teal">Cancelar</button>
+              <button onClick={() => setConsultaActiva(null)} className="btn-outline-teal">
+                Cancelar
+              </button>
             </div>
           </div>
         </div>

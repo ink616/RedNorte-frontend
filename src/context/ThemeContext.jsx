@@ -1,27 +1,29 @@
-// src/context/ThemeContext.jsx — REEMPLAZAR COMPLETO
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
-  const [darkMode, setDarkMode] = useState(false);
+  const [dark, setDark] = useState(() => localStorage.getItem('rednorte_theme') === 'dark');
 
   useEffect(() => {
     const html = document.documentElement;
-    if (darkMode) {
-      html.setAttribute('data-theme', 'dark');
-      html.style.colorScheme = 'dark';
-    } else {
-      html.setAttribute('data-theme', 'light');
-      html.style.colorScheme = 'light';
-    }
-    localStorage.setItem('rednorte_theme', darkMode ? 'dark' : 'light');
-  }, [darkMode]);
+    html.setAttribute('data-theme', dark ? 'dark' : 'light');
+    html.style.colorScheme = dark ? 'dark' : 'light';
+    localStorage.setItem('rednorte_theme', dark ? 'dark' : 'light');
+  }, [dark]);
 
-  const toggleDark = () => setDarkMode(prev => !prev);
+  const toggleTheme = () => setDark(prev => !prev);
+
+  // Expone ambos nombres por compatibilidad con todo el codigo del proyecto
+  const value = {
+    dark,
+    darkMode: dark,
+    toggleTheme,
+    toggleDark: toggleTheme,
+  };
 
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleDark }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

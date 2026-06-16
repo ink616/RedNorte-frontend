@@ -1943,3 +1943,58 @@ html[data-theme="dark"] .btn-outline-teal {
 .modal-sin-consultas       { text-align: center; padding: 48px; color: #6B7280; background: #FFFFFF; border-radius: 12px; }
 /* Row cursor en tabla */
 .tr-clickable              { cursor: pointer; }
+admin-dist-card {
+  margin-bottom: 24px;
+}
+ 
+.dist-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+ 
+.dist-item {
+  flex: 1;
+  min-width: 100px;
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-align: center;
+}
+ 
+.dist-num {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+ 
+.dist-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+ 
+.dist-pct {
+  font-size: 12px;
+  opacity: 0.75;
+}
+ 
+/* Link "Ver todas" en card-header-bar */
+.card-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+ 
+.card-header-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+ 
+.card-header-link:hover {
+  text-decoration: underline;
+}

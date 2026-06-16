@@ -4,9 +4,7 @@ import { listarUsuarios, listarRoles, registrarUsuario, obtenerFicha, listarCons
 
 /* ── Componentes locales ─────────────────────────────── */
 const Badge = ({ color, texto }) => (
-  <span className={`badge-${color} badge-red badge-amber badge-blue badge-teal badge-gray`.includes(`badge-${color}`) ? `badge-${color}` : 'badge-gray'}>
-    {texto}
-  </span>
+  <span className={`badge-${color}`}>{texto}</span>
 );
 
 const TagList = ({ str, color }) => str
@@ -56,6 +54,7 @@ function ModalUsuario({ usuario, onClose }) {
 
   const imc = ficha?.estatura && ficha?.peso
     ? (ficha.peso / ((ficha.estatura / 100) ** 2)).toFixed(1) : null;
+  /* color IMC es dinámico → inline */
   const imcColor = imc ? (imc < 18.5 ? '#F59E0B' : imc < 25 ? '#10B981' : imc < 30 ? '#F59E0B' : '#EF4444') : '#6B7280';
   const imcLabel = imc ? (imc < 18.5 ? 'Bajo peso' : imc < 25 ? 'Normal' : imc < 30 ? 'Sobrepeso' : 'Obesidad') : 'IMC';
 
@@ -109,6 +108,7 @@ function ModalUsuario({ usuario, onClose }) {
                     { label: imcLabel,   valor: ficha.grupoSanguineo || '—',                    color: '#7C3AED' },
                   ].map(s => (
                     <div key={s.label} className="modal-ficha-stat">
+                      {/* color de cada stat es dinámico → inline */}
                       <div className="modal-ficha-stat-num" style={{ color: s.color }}>{s.valor}</div>
                       <div className="modal-ficha-stat-label">{s.label}</div>
                     </div>
@@ -146,8 +146,8 @@ function ModalUsuario({ usuario, onClose }) {
 
                 {(ficha.cirugiasPrevias || ficha.antecedentesFamiliares) && (
                   <div className="modal-ficha-2col">
-                    {ficha.cirugiasPrevias    && <Cuadro icon="🏥" titulo="Cirugías previas"><p className="modal-ficha-text">{ficha.cirugiasPrevias}</p></Cuadro>}
-                    {ficha.antecedentesFamiliares && <Cuadro icon="👨‍👩‍👧" titulo="Antecedentes familiares"><p className="modal-ficha-text">{ficha.antecedentesFamiliares}</p></Cuadro>}
+                    {ficha.cirugiasPrevias         && <Cuadro icon="🏥" titulo="Cirugías previas"><p className="modal-ficha-text">{ficha.cirugiasPrevias}</p></Cuadro>}
+                    {ficha.antecedentesFamiliares  && <Cuadro icon="👨‍👩‍👧" titulo="Antecedentes familiares"><p className="modal-ficha-text">{ficha.antecedentesFamiliares}</p></Cuadro>}
                   </div>
                 )}
 
@@ -201,16 +201,16 @@ function ModalUsuario({ usuario, onClose }) {
 
 /* ── Página principal ────────────────────────────────── */
 export default function AdminUsuariosPage() {
-  const [usuarios, setUsuarios]       = useState([]);
-  const [roles,    setRoles]          = useState([]);
-  const [loading,  setLoading]        = useState(true);
-  const [mostrar,  setMostrar]        = useState(false);
+  const [usuarios, setUsuarios]         = useState([]);
+  const [roles,    setRoles]            = useState([]);
+  const [loading,  setLoading]          = useState(true);
+  const [mostrar,  setMostrar]          = useState(false);
   const [usuarioModal, setUsuarioModal] = useState(null);
-  const [form, setForm]               = useState({ id: '', mail: '', pass: '', estado: 'ACTIVO', rolId: '', apellido1: '', apellido2: '', rut: '' });
-  const [creando, setCreando]         = useState(false);
-  const [error,   setError]           = useState('');
-  const [exito,   setExito]           = useState('');
-  const [buscar,  setBuscar]          = useState('');
+  const [form, setForm]                 = useState({ id: '', mail: '', pass: '', estado: 'ACTIVO', rolId: '', apellido1: '', apellido2: '', rut: '' });
+  const [creando, setCreando]           = useState(false);
+  const [error,   setError]             = useState('');
+  const [exito,   setExito]             = useState('');
+  const [buscar,  setBuscar]            = useState('');
 
   const cargar = () => {
     setLoading(true);
@@ -227,7 +227,9 @@ export default function AdminUsuariosPage() {
       await registrarUsuario({
         id: form.id, mail: form.mail, pass: form.pass, estado: form.estado,
         fechaRegistro: new Date().toISOString(), rol,
-        persona: form.apellido1 ? { id: 'PER-' + form.id, rut: form.rut, apellido1: form.apellido1, apellido2: form.apellido2, sexo: 'M', fechaNacimiento: '2000-01-01' } : null,
+        persona: form.apellido1
+          ? { id: 'PER-' + form.id, rut: form.rut, apellido1: form.apellido1, apellido2: form.apellido2, sexo: 'M', fechaNacimiento: '2000-01-01' }
+          : null,
       });
       setExito('Usuario creado correctamente.'); setMostrar(false);
       setForm({ id: '', mail: '', pass: '', estado: 'ACTIVO', rolId: '', apellido1: '', apellido2: '', rut: '' });
@@ -250,7 +252,9 @@ export default function AdminUsuariosPage() {
 
       <div className="admin-usuarios-bar">
         <h2 className="page-title" style={{ margin: 0 }}>👥 Gestión de usuarios</h2>
-        <button className="btn btn-primary" onClick={() => setMostrar(!mostrar)}>{mostrar ? 'Cancelar' : '+ Nuevo usuario'}</button>
+        <button className="btn btn-primary" onClick={() => setMostrar(!mostrar)}>
+          {mostrar ? 'Cancelar' : '+ Nuevo usuario'}
+        </button>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
@@ -274,7 +278,9 @@ export default function AdminUsuariosPage() {
               <div className="form-group"><label>Segundo apellido</label><input className="form-control" value={form.apellido2} onChange={set('apellido2')} /></div>
               <div className="form-group"><label>RUT</label><input className="form-control" value={form.rut} onChange={set('rut')} placeholder="12345678-9" /></div>
             </div>
-            <button type="submit" className="btn btn-primary" disabled={creando}>{creando ? 'Creando...' : 'Crear usuario'}</button>
+            <button type="submit" className="btn btn-primary" disabled={creando}>
+              {creando ? 'Creando...' : 'Crear usuario'}
+            </button>
           </form>
         </div>
       )}
@@ -287,7 +293,9 @@ export default function AdminUsuariosPage() {
       {loading ? <div className="spinner">Cargando usuarios...</div> : (
         <div className="card card-flush">
           <table className="tabla">
-            <thead><tr><th>ID</th><th>Correo</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Registro</th><th></th></tr></thead>
+            <thead>
+              <tr><th>ID</th><th>Correo</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Registro</th><th></th></tr>
+            </thead>
             <tbody>
               {filtrados.map(u => (
                 <tr key={u.id} className="tr-clickable" onClick={() => setUsuarioModal(u)}>
@@ -300,7 +308,9 @@ export default function AdminUsuariosPage() {
                   <td className="td-center"><span style={{ fontSize: 16, opacity: 0.5 }}>👁️</span></td>
                 </tr>
               ))}
-              {filtrados.length === 0 && <tr><td colSpan={7} className="td-empty">Sin resultados.</td></tr>}
+              {filtrados.length === 0 && (
+                <tr><td colSpan={7} className="td-empty">Sin resultados.</td></tr>
+              )}
             </tbody>
           </table>
         </div>
