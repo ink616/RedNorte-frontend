@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { registrarUsuario } from '../service/api';
 
-// Validar RUT chileno
 function validarRut(rut) {
   if (!rut) return false;
   const rutLimpio = rut.replace(/\./g, '').replace(/-/g, '');
@@ -32,9 +31,9 @@ const PASOS = ['Cuenta', 'Datos personales', 'Confirmación'];
 
 export default function RegistroPage() {
   const navigate = useNavigate();
-  const [paso, setPaso] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [paso, setPaso]           = useState(0);
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState('');
   const [mostrarPass, setMostrarPass] = useState(false);
 
   const [form, setForm] = useState({
@@ -84,7 +83,6 @@ export default function RegistroPage() {
   const handleRegistrar = async () => {
     setLoading(true); setError('');
     try {
-      const rutLimpio = form.rut.replace(/\./g, '').replace(/-/g, '');
       const userId = 'USR-' + Date.now();
       await registrarUsuario({
         id: userId,
@@ -108,112 +106,111 @@ export default function RegistroPage() {
     } finally { setLoading(false); }
   };
 
-  const inputStyle = (valid) => ({
-    width: '100%', padding: '10px 14px', fontSize: 14,
-    border: `1px solid ${valid === false ? '#EF4444' : valid === true ? '#10B981' : 'var(--color-border-tertiary)'}`,
-    borderRadius: 8, background: 'var(--color-background-secondary)',
-    color: 'var(--color-text-primary)', outline: 'none', boxSizing: 'border-box',
-  });
+  /* Clase del input según validez */
+  const inputCls = (valid) =>
+    `registro-input${valid === false ? ' error' : valid === true ? ' ok' : ''}`;
 
+  /* Pantalla de éxito */
   if (paso === 3) return (
-    <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-      <div style={{ textAlign: 'center', maxWidth: 400 }}>
-        <div style={{ fontSize: 72, marginBottom: 16 }}>🎉</div>
-        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: 'var(--color-text-primary)' }}>¡Cuenta creada!</h2>
-        <p style={{ color: 'var(--color-text-secondary)', marginBottom: 28, lineHeight: 1.7 }}>
+    <div className="registro-exito">
+      <div className="registro-exito-inner">
+        <div className="registro-exito-icon">🎉</div>
+        <h2 className="registro-exito-title">¡Cuenta creada!</h2>
+        <p className="registro-exito-desc">
           Tu cuenta en RedNorte fue creada exitosamente. Ya puedes iniciar sesión y solicitar tu primera consulta médica.
         </p>
-        <Link to="/login" style={{
-          background: 'linear-gradient(135deg,#2563EB,#0D9488)', color: 'white',
-          padding: '12px 32px', borderRadius: 24, fontWeight: 700, fontSize: 15, textDecoration: 'none',
-        }}>Iniciar sesión →</Link>
+        <Link to="/login" className="registro-exito-btn">Iniciar sesión →</Link>
       </div>
     </div>
   );
 
   return (
-    <div style={{ minHeight: '90vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--color-background-secondary)' }}>
-      <div style={{ width: '100%', maxWidth: 480 }}>
+    <div className="registro-page">
+      <div className="registro-wrap">
 
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <img src="/logo.png" alt="RedNorte" style={{ height: 56 }} />
-          <h1 style={{ fontSize: 22, fontWeight: 800, marginTop: 12, color: 'var(--color-text-primary)' }}>
-            Crear cuenta en RedNorte
-          </h1>
-          <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', marginTop: 4 }}>
-            Accede a atención médica especializada de forma gratuita
-          </p>
+        <div className="registro-logo-wrap">
+          <img src="/logo.png" alt="RedNorte" className="registro-logo" />
+          <h1 className="registro-title">Crear cuenta en RedNorte</h1>
+          <p className="registro-subtitle">Accede a atención médica especializada de forma gratuita</p>
         </div>
 
-        {/* Pasos */}
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 28 }}>
+        {/* Stepper */}
+        <div className="registro-stepper">
           {PASOS.map((p, i) => (
             <React.Fragment key={p}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 13, fontWeight: 700,
-                  background: i < paso ? '#10B981' : i === paso ? '#2563EB' : 'var(--color-border-tertiary)',
-                  color: i <= paso ? 'white' : 'var(--color-text-secondary)',
-                }}>{i < paso ? '✓' : i + 1}</div>
-                <div style={{ fontSize: 11, marginTop: 4, color: i === paso ? '#2563EB' : 'var(--color-text-secondary)', fontWeight: i === paso ? 600 : 400 }}>{p}</div>
+              <div className="registro-step">
+                <div className={`registro-step-circle ${i < paso ? 'done' : i === paso ? 'active' : 'pending'}`}>
+                  {i < paso ? '✓' : i + 1}
+                </div>
+                <div className={`registro-step-label ${i === paso ? 'active' : 'inactive'}`}>{p}</div>
               </div>
-              {i < PASOS.length - 1 && <div style={{ flex: 1, height: 2, background: i < paso ? '#10B981' : 'var(--color-border-tertiary)', marginBottom: 16 }} />}
+              {i < PASOS.length - 1 && (
+                <div className={`registro-step-line ${i < paso ? 'done' : 'pending'}`} />
+              )}
             </React.Fragment>
           ))}
         </div>
 
-        <div style={{ background: 'var(--color-background-primary)', borderRadius: 16, padding: '2rem', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+        <div className="registro-card">
 
-          {error && <div style={{ background: '#FCEBEB', color: '#A32D2D', borderRadius: 8, padding: '10px 14px', fontSize: 13, marginBottom: 16 }}>⚠️ {error}</div>}
+          {error && <div className="registro-error-box">⚠️ {error}</div>}
 
           {/* PASO 0: Cuenta */}
           {paso === 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 4, color: 'var(--color-text-primary)' }}>Datos de acceso</h3>
+            <div className="registro-step-body">
+              <h3 className="registro-step-title">Datos de acceso</h3>
 
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 6 }}>CORREO ELECTRÓNICO</label>
-                <input style={inputStyle(form.mail ? form.mail.includes('@') : undefined)} value={form.mail} onChange={set('mail')} placeholder="tu@correo.cl" type="email" />
+                <label className="registro-label">CORREO ELECTRÓNICO</label>
+                <input className={inputCls(form.mail ? form.mail.includes('@') : undefined)}
+                  value={form.mail} onChange={set('mail')} placeholder="tu@correo.cl" type="email" />
               </div>
 
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 6 }}>CONTRASEÑA</label>
-                <div style={{ position: 'relative' }}>
-                  <input style={{ ...inputStyle(form.pass ? fuerza >= 2 : undefined), paddingRight: 44 }}
+                <label className="registro-label">CONTRASEÑA</label>
+                <div className="registro-input-wrap">
+                  <input className={`${inputCls(form.pass ? fuerza >= 2 : undefined)} registro-input-pr`}
                     value={form.pass} onChange={set('pass')} placeholder="Mínimo 8 caracteres"
                     type={mostrarPass ? 'text' : 'password'} />
-                  <button type="button" onClick={() => setMostrarPass(!mostrarPass)} style={{
-                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
-                    background: 'none', border: 'none', cursor: 'pointer', fontSize: 16,
-                  }}>{mostrarPass ? '🙈' : '👁️'}</button>
+                  <button type="button" onClick={() => setMostrarPass(!mostrarPass)} className="registro-show-pass">
+                    {mostrarPass ? '🙈' : '👁️'}
+                  </button>
                 </div>
                 {form.pass && (
-                  <div style={{ marginTop: 8 }}>
-                    <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
-                      {[1,2,3,4].map(i => (
-                        <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= fuerza ? fuerzaColor : 'var(--color-border-tertiary)', transition: 'all 0.3s' }} />
+                  <div className="registro-fortaleza">
+                    <div className="registro-fuerza-bars">
+                      {[1, 2, 3, 4].map(i => (
+                        /* color dinámico de barras: se queda inline */
+                        <div key={i} className="registro-fuerza-bar"
+                          style={{ background: i <= fuerza ? fuerzaColor : 'var(--color-border-tertiary)' }} />
                       ))}
                     </div>
-                    <div style={{ fontSize: 11, color: fuerzaColor, fontWeight: 600 }}>Contraseña {fuerzaLabel}</div>
-                    <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginTop: 4 }}>
-                      {fuerza < 4 && '💡 Agrega ' + [form.pass.length < 8 && '8+ caracteres', !/[A-Z]/.test(form.pass) && 'mayúsculas', !/[0-9]/.test(form.pass) && 'números', !/[^A-Za-z0-9]/.test(form.pass) && 'símbolos'].filter(Boolean).join(', ')}
+                    <div className="registro-fuerza-label" style={{ color: fuerzaColor }}>
+                      Contraseña {fuerzaLabel}
+                    </div>
+                    <div className="registro-fuerza-hint">
+                      {fuerza < 4 && '💡 Agrega ' + [
+                        form.pass.length < 8      && '8+ caracteres',
+                        !/[A-Z]/.test(form.pass)  && 'mayúsculas',
+                        !/[0-9]/.test(form.pass)  && 'números',
+                        !/[^A-Za-z0-9]/.test(form.pass) && 'símbolos',
+                      ].filter(Boolean).join(', ')}
                     </div>
                   </div>
                 )}
               </div>
 
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 6 }}>CONFIRMAR CONTRASEÑA</label>
-                <input style={inputStyle(form.confirmPass ? form.confirmPass === form.pass : undefined)}
+                <label className="registro-label">CONFIRMAR CONTRASEÑA</label>
+                <input className={inputCls(form.confirmPass ? form.confirmPass === form.pass : undefined)}
                   value={form.confirmPass} onChange={set('confirmPass')} placeholder="Repite tu contraseña"
                   type={mostrarPass ? 'text' : 'password'} />
                 {form.confirmPass && form.confirmPass !== form.pass && (
-                  <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Las contraseñas no coinciden</div>
+                  <div className="registro-val-err">Las contraseñas no coinciden</div>
                 )}
                 {form.confirmPass && form.confirmPass === form.pass && (
-                  <div style={{ fontSize: 11, color: '#10B981', marginTop: 4 }}>✓ Las contraseñas coinciden</div>
+                  <div className="registro-val-ok">✓ Las contraseñas coinciden</div>
                 )}
               </div>
             </div>
@@ -221,39 +218,41 @@ export default function RegistroPage() {
 
           {/* PASO 1: Datos personales */}
           {paso === 1 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 4, color: 'var(--color-text-primary)' }}>Datos personales</h3>
+            <div className="registro-step-body">
+              <h3 className="registro-step-title">Datos personales</h3>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="registro-grid-2">
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 6 }}>PRIMER APELLIDO *</label>
-                  <input style={inputStyle(form.apellido1 ? true : undefined)} value={form.apellido1} onChange={set('apellido1')} placeholder="González" />
+                  <label className="registro-label">PRIMER APELLIDO *</label>
+                  <input className={inputCls(form.apellido1 ? true : undefined)}
+                    value={form.apellido1} onChange={set('apellido1')} placeholder="González" />
                 </div>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 6 }}>SEGUNDO APELLIDO</label>
-                  <input style={inputStyle()} value={form.apellido2} onChange={set('apellido2')} placeholder="Muñoz" />
+                  <label className="registro-label">SEGUNDO APELLIDO</label>
+                  <input className="registro-input" value={form.apellido2} onChange={set('apellido2')} placeholder="Muñoz" />
                 </div>
               </div>
 
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 6 }}>RUT *</label>
-                <input style={inputStyle(form.rut ? validarRut(form.rut) : undefined)}
+                <label className="registro-label">RUT *</label>
+                <input className={inputCls(form.rut ? validarRut(form.rut) : undefined)}
                   value={form.rut}
                   onChange={e => setForm({ ...form, rut: formatearRut(e.target.value) })}
                   placeholder="12.345.678-9" />
-                {form.rut && !validarRut(form.rut) && <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>RUT inválido</div>}
-                {form.rut && validarRut(form.rut) && <div style={{ fontSize: 11, color: '#10B981', marginTop: 4 }}>✓ RUT válido</div>}
+                {form.rut && !validarRut(form.rut) && <div className="registro-val-err">RUT inválido</div>}
+                {form.rut && validarRut(form.rut)  && <div className="registro-val-ok">✓ RUT válido</div>}
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="registro-grid-2">
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 6 }}>FECHA DE NACIMIENTO *</label>
-                  <input type="date" style={inputStyle(form.fechaNacimiento ? true : undefined)} value={form.fechaNacimiento} onChange={set('fechaNacimiento')}
+                  <label className="registro-label">FECHA DE NACIMIENTO *</label>
+                  <input type="date" className={inputCls(form.fechaNacimiento ? true : undefined)}
+                    value={form.fechaNacimiento} onChange={set('fechaNacimiento')}
                     max={new Date().toISOString().split('T')[0]} />
                 </div>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 6 }}>SEXO *</label>
-                  <select style={inputStyle(form.sexo ? true : undefined)} value={form.sexo} onChange={set('sexo')}>
+                  <label className="registro-label">SEXO *</label>
+                  <select className={inputCls(form.sexo ? true : undefined)} value={form.sexo} onChange={set('sexo')}>
                     <option value="">Selecciona...</option>
                     <option value="M">Masculino</option>
                     <option value="F">Femenino</option>
@@ -267,7 +266,7 @@ export default function RegistroPage() {
           {/* PASO 2: Confirmación */}
           {paso === 2 && (
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16, color: 'var(--color-text-primary)' }}>Confirma tus datos</h3>
+              <h3 className="registro-step-title">Confirma tus datos</h3>
               {[
                 ['Correo', form.mail],
                 ['Contraseña', '••••••••'],
@@ -276,37 +275,32 @@ export default function RegistroPage() {
                 ['Fecha de nacimiento', form.fechaNacimiento],
                 ['Sexo', form.sexo === 'M' ? 'Masculino' : form.sexo === 'F' ? 'Femenino' : 'Prefiero no decir'],
               ].map(([k, v]) => (
-                <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '0.5px solid var(--color-border-tertiary)', fontSize: 14 }}>
-                  <span style={{ color: 'var(--color-text-secondary)' }}>{k}</span>
-                  <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{v}</span>
+                <div key={k} className="registro-confirm-row">
+                  <span className="registro-confirm-key">{k}</span>
+                  <span className="registro-confirm-val">{v}</span>
                 </div>
               ))}
-              <div style={{ background: '#EFF6FF', borderRadius: 8, padding: '12px 14px', marginTop: 16, fontSize: 13, color: '#1e40af' }}>
+              <div className="registro-info-box">
                 🔒 Tus datos están protegidos y solo serán usados para tu atención médica.
               </div>
             </div>
           )}
 
           {/* Botones */}
-          <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+          <div className="registro-btns">
             {paso > 0 && (
-              <button onClick={() => { setPaso(paso - 1); setError(''); }} style={{
-                flex: 1, padding: '12px', borderRadius: 8, border: '0.5px solid var(--color-border-tertiary)',
-                background: 'var(--color-background-secondary)', cursor: 'pointer', fontSize: 14, fontWeight: 500,
-                color: 'var(--color-text-primary)',
-              }}>← Volver</button>
+              <button onClick={() => { setPaso(paso - 1); setError(''); }} className="registro-back-btn">
+                ← Volver
+              </button>
             )}
-            <button onClick={paso < 2 ? handleSiguiente : handleRegistrar} disabled={loading} style={{
-              flex: 2, padding: '12px', borderRadius: 8, border: 'none',
-              background: 'linear-gradient(135deg,#2563EB,#0D9488)', color: 'white',
-              cursor: loading ? 'wait' : 'pointer', fontSize: 14, fontWeight: 700,
-            }}>
+            <button onClick={paso < 2 ? handleSiguiente : handleRegistrar}
+              disabled={loading} className="registro-next-btn">
               {loading ? 'Creando cuenta...' : paso < 2 ? 'Siguiente →' : '🎉 Crear cuenta'}
             </button>
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: 16, fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            ¿Ya tienes cuenta? <Link to="/login" style={{ color: '#2563EB', fontWeight: 600 }}>Iniciar sesión</Link>
+          <div className="registro-login-link">
+            ¿Ya tienes cuenta? <Link to="/login">Iniciar sesión</Link>
           </div>
         </div>
       </div>

@@ -12,8 +12,8 @@ const ESPECIALIDADES = [
 export default function NuevaConsultaPage() {
   const { usuario } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ nombrePaciente: '', especialidad: '', sintomas: '' });
-  const [error, setError] = useState('');
+  const [form, setForm]     = useState({ nombrePaciente: '', especialidad: '', sintomas: '' });
+  const [error, setError]   = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -35,7 +35,7 @@ export default function NuevaConsultaPage() {
   };
 
   return (
-    <div className="page" style={{ maxWidth: 640 }}>
+    <div className="page nueva-consulta-page">
       <h2 className="page-title">📋 Nueva consulta médica</h2>
 
       <div className="card">
@@ -58,22 +58,19 @@ export default function NuevaConsultaPage() {
               onChange={e => setForm({ ...form, especialidad: e.target.value })} required>
               <option value="">Selecciona una especialidad...</option>
               {ESPECIALIDADES.map(e => (
-                <option key={e} value={e}>
-                  {e.charAt(0).toUpperCase() + e.slice(1)}
-                </option>
+                <option key={e} value={e}>{e.charAt(0).toUpperCase() + e.slice(1)}</option>
               ))}
             </select>
           </div>
 
           <div className="form-group">
             <label>Descripción de síntomas</label>
-            <textarea className="form-control" value={form.sintomas}
+            <textarea className="form-control nueva-consulta-area" value={form.sintomas}
               onChange={e => setForm({ ...form, sintomas: e.target.value })}
-              placeholder="Describe detalladamente tus síntomas..."
-              style={{ minHeight: 120 }} required />
+              placeholder="Describe detalladamente tus síntomas..." required />
           </div>
 
-          <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+          <div className="nueva-consulta-btns">
             <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? 'Enviando...' : '✅ Enviar consulta'}
             </button>

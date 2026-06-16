@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider }     from './context/ThemeContext';
+import AgendarPage           from './pages/AgendarPage';
+
 import                            './index.css';
 import Footer                from './components/Footer';
 import Navbar                from './components/navbar';
@@ -33,8 +35,9 @@ const RutaAdmin = () => {
 };
 
 const RutaDoctor = () => {
-  const { usuario, esDoctor } = useAuth();
+  const { usuario, esDoctor, esAdmin } = useAuth();
   if (!usuario) return <Navigate to="/login" replace />;
+  if (esAdmin) return <Navigate to="/admin/dashboard" replace />;
   if (!esDoctor) return <Navigate to="/mis-consultas" replace />;
   return <Outlet />;
 };
@@ -43,7 +46,7 @@ const RutaPublica = ({ children }) => {
   const { usuario, esAdmin, esDoctor } = useAuth();
   if (usuario) {
     if (esAdmin) return <Navigate to="/admin/dashboard" replace />;
-    if (esDoctor) return <Navigate to="/doctor/dashboard" replace />;
+    if (esDoctor) return <Navigate to="/doctor/dashboard" replace />;  // ← esto SÍ está
     return <Navigate to="/mis-consultas" replace />;
   }
   return children;
@@ -65,8 +68,8 @@ function AppRoutes() {
           <Route path="/nueva-consulta"      element={<NuevaConsultaPage />} />
           <Route path="/editar-consulta/:id" element={<EditarConsultaPage />} />
           <Route path="/perfil"              element={<PerfilPage />} />
+          <Route path="/agendar"             element={<AgendarPage />} />  {/* ← nuevo */}
         </Route>
-
         <Route element={<RutaAdmin />}>
           <Route path="/admin/dashboard"    element={<AdminDashboard />} />
           <Route path="/admin/consultas"    element={<AdminConsultasPage />} />
