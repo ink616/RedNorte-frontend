@@ -3,6 +3,7 @@ import { listarTodasConsultas, actualizarConsultaAdmin, eliminarConsulta, regist
 import Badge from '../components/Badge';
 
 const ESTADOS = ['PENDIENTE','AGENDADA','CANCELADA','REASIGNADA','ATENDIDA'];
+const REQUIERE_FECHA = ['AGENDADA','REASIGNADA'];
 
 export default function AdminConsultasPage() {
   const [consultas,     setConsultas]     = useState([]);
@@ -33,6 +34,10 @@ export default function AdminConsultasPage() {
   };
 
   const guardar = async () => {
+    if (REQUIERE_FECHA.includes(formAdmin.estado) && !formAdmin.fechaCita) {
+      setError('Para agendar debes asignar la fecha y hora de la cita.');
+      return;
+    }
     setSaving(true); setError(''); setExito('');
     try {
       await actualizarConsultaAdmin(editando, {
@@ -136,10 +141,12 @@ export default function AdminConsultasPage() {
                               {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
                             </select>
                           </div>
-                          <div className="form-group" style={{ margin: 0 }}>
-                            <label>Fecha de cita</label>
-                            <input type="datetime-local" className="form-control" value={formAdmin.fechaCita} onChange={e => setFormAdmin({ ...formAdmin, fechaCita: e.target.value })} />
-                          </div>
+                          {REQUIERE_FECHA.includes(formAdmin.estado) && (
+                            <div className="form-group" style={{ margin: 0 }}>
+                              <label>Fecha y hora de cita <span style={{ color: 'var(--danger)' }}>*</span></label>
+                              <input type="datetime-local" className="form-control" value={formAdmin.fechaCita} min={new Date().toISOString().slice(0,16)} onChange={e => setFormAdmin({ ...formAdmin, fechaCita: e.target.value })} />
+                            </div>
+                          )}
                           <div className="form-group" style={{ margin: 0, gridColumn: '1/-1' }}>
                             <label>Notas del administrador</label>
                             <textarea className="form-control" style={{ minHeight: 60 }} value={formAdmin.notasAdmin} onChange={e => setFormAdmin({ ...formAdmin, notasAdmin: e.target.value })} />

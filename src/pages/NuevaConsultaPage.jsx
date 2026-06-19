@@ -44,7 +44,7 @@ export default function NuevaConsultaPage() {
       <div className="page-header">
         <div>
           <h1 className="page-title">📝 Nueva consulta médica</h1>
-          <p className="page-subtitle">CuÃ©ntanos quÃ© necesitas y te asignaremos un especialista</p>
+          <p className="page-subtitle">Cuéntanos qué necesitas y te asignaremos un especialista</p>
         </div>
       </div>
 
@@ -59,7 +59,7 @@ export default function NuevaConsultaPage() {
             <label>Tu nombre completo</label>
             <input className="form-control" value={form.nombrePaciente}
               onChange={e => setForm({ ...form, nombrePaciente: e.target.value })}
-              placeholder="Ej: Juan PÃ©rez GonzÃ¡lez" required />
+              placeholder="Ej: Juan Pérez González" required />
           </div>
 
           <div className="form-group">
@@ -79,9 +79,9 @@ export default function NuevaConsultaPage() {
             <label>Descripción de síntomas</label>
             <textarea className="form-control" value={form.sintomas}
               onChange={e => setForm({ ...form, sintomas: e.target.value })}
-              placeholder="Describe detalladamente tus sÃ­ntomas, desde cuÃ¡ndo los tienes y su intensidad..."
+              placeholder="Describe detalladamente tus síntomas, desde cuándo los tienes y su intensidad..."
               style={{ minHeight: 130 }} required />
-            <p className="form-hint">Mientras mÃ¡s detalles, mejor podremos orientar tu atenciÃ³n.</p>
+            <p className="form-hint">Mientras más detalles, mejor podremos orientar tu atención.</p>
           </div>
 
           <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
