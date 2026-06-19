@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { obtenerConsulta, editarConsultaPaciente } from '../service/api';
-import Badge from '../components/Badge';
+import Badge from '@rednorte/badge';
 
 export default function EditarConsultaPage() {
   const { id } = useParams();

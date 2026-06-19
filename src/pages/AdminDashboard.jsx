@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { obtenerResumenEstadisticas, listarTodasConsultas } from '../service/api';
-import Badge from '../components/Badge';
+import Badge from '@rednorte/badge';
 
 export default function AdminDashboard() {
   const [stats,     setStats]     = useState(null);

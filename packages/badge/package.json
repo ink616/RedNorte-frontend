@@ -1,0 +1,12 @@
+{
+  "name": "@rednorte/badge",
+  "version": "1.0.0",
+  "description": "Badge visual reutilizable para representar el estado de una consulta médica (RedNorte)",
+  "main": "src/index.js",
+  "private": true,
+  "peerDependencies": {
+    "react": "^18.2.0"
+  },
+  "keywords": ["rednorte", "badge", "ui-component"],
+  "license": "UNLICENSED"
+}

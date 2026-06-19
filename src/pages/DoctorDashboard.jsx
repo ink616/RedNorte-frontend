@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { listarTodasConsultas, actualizarConsultaAdmin, registrarAuditoria } from '../service/api';
-import Badge from '../components/Badge';
+import Badge from '@rednorte/badge';
 
 const ESTADOS = ['PENDIENTE', 'AGENDADA', 'ATENDIDA', 'CANCELADA'];
 // Estados que requieren asignar fecha y hora de atencion
