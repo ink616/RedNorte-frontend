@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+﻿import React, { createContext, useContext, useState } from 'react';
 import axios from 'axios';
 import { login as loginApi } from '../service/api';
 
@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
       const raw = localStorage.getItem('rednorte_usuario');
       if (!raw) return null;
       const u = JSON.parse(raw);
-      // Al recargar la página, re-aplica el token guardado
+      // Al recargar la pÃ¡gina, re-aplica el token guardado
       if (u?.token) aplicarToken(u.token);
       return u;
     } catch { return null; }
@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
   const esDoctor = usuario?.rol?.tag === 'DOCTOR';
 
   return (
-    <AuthContext.Provider value={{ usuario, login, iniciarSesion, logout, esAdmin, esDoctor }}>
+    <AuthContext.Provider value={{ usuario, login, iniciarSesion, logout, cerrarSesion: logout, esAdmin, esDoctor }}>
       {children}
     </AuthContext.Provider>
   );
