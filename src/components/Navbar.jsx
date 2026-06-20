@@ -76,8 +76,7 @@ export default function Navbar() {
           <>
             <Link to="/"               style={linkStyle('/', true)}>Inicio</Link>
             <Link to="/mis-consultas"  style={linkStyle('/mis-consultas')}>Mis Consultas</Link>
-            <Link to="/nueva-consulta" style={linkStyle('/nueva-consulta')}>Nueva Consulta</Link>
-            <Link to="/reservar-hora"  style={linkStyle('/reservar-hora')}>Reservar Hora</Link>
+            <Link to="/agendar"        style={linkStyle('/agendar')}>Agendar Cita</Link>
             <Link to="/perfil"         style={linkStyle('/perfil')}>Mi Perfil</Link>
           </>
         )}

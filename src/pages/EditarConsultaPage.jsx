@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { obtenerConsulta, editarConsultaPaciente } from '../service/api';
-import Badge from '@rednorte/badge';
+import Badge from '../components/Badge';
 
 export default function EditarConsultaPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [consulta, setConsulta] = useState(null);
-  const [form, setForm] = useState({ nombrePaciente: '', sintomas: '' });
+  const [form, setForm] = useState({ sintomas: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving]   = useState(false);
   const [error, setError]     = useState('');
@@ -15,7 +15,7 @@ export default function EditarConsultaPage() {
 
   useEffect(() => {
     obtenerConsulta(id)
-      .then(c => { setConsulta(c); setForm({ nombrePaciente: c.nombrePaciente || '', sintomas: c.sintomas || '' }); })
+      .then(c => { setConsulta(c); setForm({ sintomas: c.sintomas || '' }); })
       .catch(() => setError('No se pudo cargar la consulta.'))
       .finally(() => setLoading(false));
   }, [id]);
@@ -51,11 +51,6 @@ export default function EditarConsultaPage() {
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Tu nombre completo</label>
-            <input className="form-control" value={form.nombrePaciente}
-              onChange={e => setForm({ ...form, nombrePaciente: e.target.value })} required />
-          </div>
           <div className="form-group">
             <label>Descripción de síntomas</label>
             <textarea className="form-control" value={form.sintomas}

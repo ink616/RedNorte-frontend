@@ -22,7 +22,7 @@ export default function DoctorAgendaPage() {
     setLoading(true);
     agendaPorDoctor(doctorId).then(d => setBloques(Array.isArray(d)?d:[])).finally(()=>setLoading(false));
   };
-  useEffect(() => { cargar(); /* eslint-disable-next-line */ }, [doctorId]);
+  useEffect(() => { cargar(); }, [doctorId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const porFecha = bloques.reduce((acc, b) => { (acc[b.fecha] = acc[b.fecha] || []).push(b); return acc; }, {});
 

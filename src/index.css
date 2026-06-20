@@ -11,3 +11,5 @@
 @import './css/tables.css';      /* .tabla                     */
 @import './css/badges.css';      /* .badge + .alert            */
 @import './css/cards.css';       /* .card, stat, shortcut, hero, login */
+@import './css/nosotros.css';    /* Página Sobre Nosotros */
+@import './css/agendar.css';     /* Wizard Agendar Cita */

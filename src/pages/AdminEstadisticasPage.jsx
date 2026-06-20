@@ -65,8 +65,6 @@ const DonutChart = ({ datos }) => {
 
 export default function AdminEstadisticasPage() {
   const [resumen,  setResumen]  = useState(null);
-  const [consultas,setConsultas]= useState(null);
-  const [agenda,   setAgenda]   = useState(null);
   const [loading,  setLoading]  = useState(true);
 
   useEffect(() => {
@@ -74,7 +72,7 @@ export default function AdminEstadisticasPage() {
       obtenerResumenEstadisticas(),
       estadisticasConsultas().catch(() => ({})),
       estadisticasAgenda().catch(() => ({})),
-    ]).then(([r, c, a]) => { setResumen(r); setConsultas(c); setAgenda(a); })
+    ]).then(([r]) => { setResumen(r); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

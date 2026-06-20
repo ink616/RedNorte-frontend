@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { listarConsultasPorUsuario } from '../service/api';
-import Badge from '@rednorte/badge';
+import Badge from '../components/Badge';
 
 export default function MisConsultasPage() {
   const { usuario } = useAuth();
@@ -36,8 +36,7 @@ export default function MisConsultasPage() {
           <p className="page-subtitle">Gestiona tus citas médicas en RedNorte</p>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <Link to="/reservar-hora" className="btn btn-teal">🗓️ Reservar hora</Link>
-          <Link to="/nueva-consulta" className="btn btn-primary">+ Nueva consulta</Link>
+          <Link to="/agendar" className="btn btn-primary">📅 Agendar cita</Link>
         </div>
       </div>
 
@@ -65,10 +64,9 @@ export default function MisConsultasPage() {
         <div className="empty-state">
           <span className="icon">📭</span>
           <h3>No tienes consultas aún</h3>
-          <p style={{ marginBottom: 24 }}>Crea tu primera consulta médica o reserva una hora con un especialista.</p>
+          <p style={{ marginBottom: 24 }}>Agenda tu primera cita médica con uno de nuestros especialistas.</p>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-            <Link to="/nueva-consulta" className="btn btn-primary">Crear consulta</Link>
-            <Link to="/reservar-hora" className="btn btn-ghost">Reservar hora</Link>
+            <Link to="/agendar" className="btn btn-primary">📅 Agendar cita</Link>
           </div>
         </div>
       ) : (

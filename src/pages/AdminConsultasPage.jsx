@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { listarTodasConsultas, actualizarConsultaAdmin, eliminarConsulta, registrarAuditoria } from '../service/api';
-import Badge from '@rednorte/badge';
+import Badge from '../components/Badge';
 
 const ESTADOS = ['PENDIENTE','AGENDADA','CANCELADA','REASIGNADA','ATENDIDA'];
 const REQUIERE_FECHA = ['AGENDADA','REASIGNADA'];

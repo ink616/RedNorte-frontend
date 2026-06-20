@@ -1,210 +1,345 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const EQUIPO = [
-  { nombre:'Dr. Alejandro Vega Soto',    cargo:'Director Médico',        especialidad:'Cardiología',       iniciales:'AV', color:'#2563EB',
-    descripcion:'Más de 20 años de experiencia en cardiología intervencionista. Formado en la Universidad de Chile y con especialización en el Hospital Clínico de Barcelona.' },
-  { nombre:'Dra. Camila Rojas Fuentes',  cargo:'Jefa de Medicina General', especialidad:'Medicina General', iniciales:'CR', color:'#0D9488',
-    descripcion:'Especialista en atención primaria y medicina familiar. Comprometida con la salud preventiva y el bienestar integral de los pacientes.' },
-  { nombre:'Dr. Patricio Morales Ibáñez', cargo:'Jefe de Neurología',     especialidad:'Neurología',       iniciales:'PM', color:'#7C3AED',
-    descripcion:'Neurólogo con más de 15 años de trayectoria. Experto en enfermedades cerebrovasculares y trastornos del movimiento.' },
-  { nombre:'Dra. Valentina Castro Ríos', cargo:'Traumatóloga',            especialidad:'Traumatología',    iniciales:'VC', color:'#F59E0B',
-    descripcion:'Especialista en cirugía ortopédica y traumatología deportiva. Ha atendido a deportistas de alto rendimiento y equipos profesionales.' },
-  { nombre:'Dr. Rodrigo Núñez Lagos',    cargo:'Dermatólogo',             especialidad:'Dermatología',     iniciales:'RN', color:'#EF4444',
-    descripcion:'Dermatólogo clínico y estético con amplia experiencia en diagnóstico de lesiones cutáneas y tratamientos avanzados.' },
-  { nombre:'Dra. Sofía Herrera Pinto',   cargo:'Oftalmóloga',             especialidad:'Oftalmología',     iniciales:'SH', color:'#10B981',
-    descripcion:'Especialista en cirugía refractiva y enfermedades de la retina. Más de 10 años dedicados a preservar y restaurar la visión de sus pacientes.' },
+/* ── Datos ──────────────────────────────────────────────────── */
+const COBERTURA = [
+  { nombre: 'Arica',       activo: false },
+  { nombre: 'Iquique',     activo: false },
+  { nombre: 'Antofagasta', activo: true  },
+  { nombre: 'Copiapó',     activo: false },
+  { nombre: 'La Serena',   activo: false },
 ];
 
-const HORARIOS = [
-  { dia: 'Lunes a Viernes', horario: '08:00 — 20:00' },
-  { dia: 'Sábados',         horario: '09:00 — 14:00' },
-  { dia: 'Domingos y Festivos', horario: 'Urgencias 24/7' },
+const HERO_STATS = [
+  { icon: '🏥', num: 6,    suffix: '',    label: 'Especialidades activas' },
+  { icon: '⏰', num: 24,   suffix: '/7',  label: 'Disponibilidad' },
+  { icon: '💻', num: 100,  suffix: '%',   label: 'Digital y gratuito' },
+  { icon: '⚡', num: 5,    suffix: 'min', label: 'Tiempo prom. de agenda', prefix: '<' },
+];
+
+const BIG_STATS = [
+  { num: 500,  suffix: '+',  label: 'Pacientes atendidos', icon: '👥', color: 'var(--primary)' },
+  { num: 6,    suffix: '',   label: 'Especialidades médicas', icon: '🩺', color: 'var(--teal)' },
+  { num: 15,   suffix: '+',  label: 'Años de experiencia combinada', icon: '📅', color: 'var(--purple)' },
+  { num: 98,   suffix: '%',  label: 'Satisfacción de pacientes', icon: '⭐', color: 'var(--warning-dark)' },
 ];
 
 const VALORES = [
-  { icon:'❤️', titulo:'Compromiso',       desc:'Nos comprometemos con el bienestar de cada paciente, tratando cada caso con dedicación y profesionalismo.' },
-  { icon:'🔬', titulo:'Excelencia',       desc:'Contamos con tecnología de última generación y profesionales altamente calificados para brindarte la mejor atención.' },
-  { icon:'🤝', titulo:'Cercanía',         desc:'Creemos en una medicina humana. Escuchamos a cada paciente y los acompañamos en todo su proceso de salud.' },
-  { icon:'🔒', titulo:'Confidencialidad', desc:'Tu información médica es estrictamente privada. Garantizamos la protección total de tus datos.' },
+  { icon: '❤️', titulo: 'Compromiso', desc: 'Cada caso se trata con dedicación real, no como un número en una lista.', bg: 'var(--danger-light)' },
+  { icon: '🔬', titulo: 'Excelencia', desc: 'Tecnología actualizada y profesionales certificados en cada especialidad.', bg: 'var(--primary-light)' },
+  { icon: '🤝', titulo: 'Cercanía', desc: 'Escuchamos antes de derivar. La distancia no debería ser una barrera.', bg: 'var(--teal-light)' },
+  { icon: '🔒', titulo: 'Confidencialidad', desc: 'Tu ficha médica es privada por diseño, solo personal autorizado accede.', bg: 'var(--purple-light)' },
 ];
+
+const EQUIPO = [
+  { nombre: 'Dr. Alejandro Vega Soto', cargo: 'Director Médico', especialidad: 'Cardiología', iniciales: 'AV', color: '#2563EB', desc: 'Más de 20 años en cardiología intervencionista, formado en la U. de Chile.' },
+  { nombre: 'Dra. Camila Rojas Fuentes', cargo: 'Jefa de Medicina General', especialidad: 'Medicina General', iniciales: 'CR', color: '#0D9488', desc: 'Especialista en atención primaria y salud preventiva familiar.' },
+  { nombre: 'Dr. Patricio Morales Ibáñez', cargo: 'Jefe de Neurología', especialidad: 'Neurología', iniciales: 'PM', color: '#7C3AED', desc: 'Experto en enfermedades cerebrovasculares y trastornos del movimiento.' },
+  { nombre: 'Dra. Valentina Castro Ríos', cargo: 'Traumatóloga', especialidad: 'Traumatología', iniciales: 'VC', color: '#F59E0B', desc: 'Cirugía ortopédica y traumatología deportiva de alto rendimiento.' },
+  { nombre: 'Dr. Rodrigo Núñez Lagos', cargo: 'Dermatólogo', especialidad: 'Dermatología', iniciales: 'RN', color: '#EF4444', desc: 'Dermatología clínica y estética, diagnóstico avanzado de lesiones.' },
+  { nombre: 'Dra. Sofía Herrera Pinto', cargo: 'Oftalmóloga', especialidad: 'Oftalmología', iniciales: 'SH', color: '#10B981', desc: 'Cirugía refractiva y enfermedades de la retina, más de 10 años de práctica.' },
+];
+
+const HITOS = [
+  { año: '2021', icon: '💡', titulo: 'Nace la idea', desc: 'Identificamos que pacientes del norte viajaban horas solo para una hora de especialista.' },
+  { año: '2022', icon: '🚀', titulo: 'Primer lanzamiento', desc: 'RedNorte conecta sus primeras consultas digitales en Antofagasta.' },
+  { año: '2024', icon: '📈', titulo: 'Expansión regional', desc: 'Cobertura activa de Arica a La Serena, con seis especialidades médicas.' },
+  { año: '2026', icon: '🔄', titulo: 'Reasignación automática', desc: 'El sistema reagenda solo cuando hay cancelaciones, sin intervención manual.' },
+];
+
+const HORARIOS = [
+  { icon: '📅', dia: 'Lunes a viernes', valor: '08:00 — 18:00' },
+  { icon: '📅', dia: 'Sábados', valor: '09:00 — 14:00' },
+  { icon: '🚨', dia: 'Domingos y festivos', valor: 'Urgencias 24/7' },
+];
+
+/* ── Hooks de utilidad ──────────────────────────────────────── */
+function useReveal() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { el.classList.add('is-visible'); obs.disconnect(); } },
+      { threshold: 0.12 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return ref;
+}
+
+function Reveal({ children, as = 'div', className = '', style }) {
+  const ref = useReveal();
+  const Comp = as;
+  return <Comp ref={ref} className={`nx-reveal ${className}`} style={style}>{children}</Comp>;
+}
+
+function useCountUp(target, active, duration = 1200) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    if (!active) return;
+    let start = null;
+    let frame;
+    const step = (ts) => {
+      if (!start) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      setVal(Math.floor(progress * target));
+      if (progress < 1) frame = requestAnimationFrame(step);
+      else setVal(target);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [active, target, duration]);
+  return val;
+}
+
+function CountStat({ target, prefix = '', suffix = '', className }) {
+  const ref = useRef(null);
+  const [active, setActive] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setActive(true); obs.disconnect(); } },
+      { threshold: 0.4 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  const val = useCountUp(target, active);
+  return <div ref={ref} className={className}>{prefix}{val}{suffix}</div>;
+}
 
 export default function SobreNosotrosPage() {
   const { usuario } = useAuth();
 
   return (
-    <div className="nosotros-page">
+    <div className="nx">
 
-      {/* ── HERO ── */}
-      <div className="nosotros-hero">
-        <div className="nosotros-hero-deco-1" />
-        <div className="nosotros-hero-deco-2" />
-        <img src="/logo.png" alt="RedNorte" className="nosotros-hero-logo" />
-        <h1 className="nosotros-hero-titulo">
-          Sobre <span className="nosotros-hero-accent">RedNorte</span>
+      {/* ════════ HERO ════════ */}
+      <section className="nx-hero">
+        <div className="nx-hero-blob-1 nx-float" />
+        <div className="nx-hero-blob-2 nx-float" style={{ animationDelay: '1.5s' }} />
+        <div className="nx-hero-blob-3 nx-float" style={{ animationDelay: '0.7s' }} />
+
+        <div className="nx-hero-badge">
+          <span className="nx-hero-badge-dot nx-pulse-dot" />
+          <span className="nx-hero-badge-text">CLÍNICA DIGITAL · NORTE DE CHILE</span>
+        </div>
+
+        <h1 className="nx-hero-titulo">
+          Acortamos distancia<br /><span>entre tú y tu médico</span>
         </h1>
-        <p className="nosotros-hero-desc">
-          Somos una clínica digital comprometida con hacer la salud accesible, eficiente y humana para todos los chilenos.
+        <p className="nx-hero-lead">
+          RedNorte nace para eliminar las barreras geográficas de acceso a la salud,
+          conectando pacientes de Arica a La Serena con especialistas reales, sin
+          traslados ni esperas innecesarias.
         </p>
-      </div>
 
-      {/* ── MISIÓN Y VISIÓN ── */}
-      <div className="nosotros-section">
-        <div className="nosotros-mision-grid">
-          <div className="nosotros-mision-card nosotros-mision-card--azul">
-            <div className="nosotros-mision-icon">🎯</div>
-            <h2 className="nosotros-mision-titulo">Nuestra Misión</h2>
-            <p className="nosotros-mision-texto">
-              Brindar atención médica de calidad a través de una plataforma digital innovadora, eliminando las barreras de acceso a la salud y poniendo al paciente en el centro de cada decisión.
-            </p>
-          </div>
-          <div className="nosotros-mision-card nosotros-mision-card--verde">
-            <div className="nosotros-mision-icon">🌟</div>
-            <h2 className="nosotros-mision-titulo">Nuestra Visión</h2>
-            <p className="nosotros-mision-texto">
-              Convertirnos en la clínica digital de referencia en Chile, reconocida por la excelencia de nuestros profesionales, la innovación de nuestra plataforma y el impacto positivo que generamos en la salud de miles de familias.
-            </p>
-          </div>
-        </div>
-
-        {/* Números */}
-        <div className="nosotros-stats-grid">
-          {[
-            { num:'+500', label:'Pacientes atendidos', icon:'👥' },
-            { num:'6',    label:'Especialidades médicas', icon:'🏥' },
-            { num:'+15',  label:'Años de experiencia', icon:'📅' },
-            { num:'98%',  label:'Satisfacción', icon:'⭐' },
-          ].map(s => (
-            <div key={s.label} className="nosotros-stat-card">
-              <div className="nosotros-stat-icon">{s.icon}</div>
-              <div className="nosotros-stat-num">{s.num}</div>
-              <div className="nosotros-stat-label">{s.label}</div>
-            </div>
+        {/* Mapa de cobertura */}
+        <div className="nx-cobertura-row">
+          {COBERTURA.map((c, i) => (
+            <React.Fragment key={c.nombre}>
+              <div className="nx-cobertura-punto">
+                <span className={`nx-cobertura-nombre ${c.activo ? 'activo' : ''}`}>{c.nombre}</span>
+                <span className={`nx-cobertura-dot ${c.activo ? 'activo nx-pulse-dot' : ''}`} />
+              </div>
+              {i < COBERTURA.length - 1 && <div className="nx-cobertura-linea" />}
+            </React.Fragment>
           ))}
         </div>
 
-        {/* Valores */}
-        <div className="nosotros-section-header">
-          <span className="nosotros-chip">Nuestros valores</span>
-          <h2 className="nosotros-section-titulo">Lo que nos define</h2>
+        <div className="nx-hero-stats">
+          {HERO_STATS.map(s => (
+            <div key={s.label} className="nx-hero-stat">
+              <div className="nx-hero-stat-icon">{s.icon}</div>
+              <CountStat target={s.num} prefix={s.prefix} suffix={s.suffix} className="nx-hero-stat-num" />
+              <div className="nx-hero-stat-label">{s.label}</div>
+            </div>
+          ))}
         </div>
-        <div className="nosotros-valores-grid">
+      </section>
+
+      {/* ════════ MISIÓN Y VISIÓN ════════ */}
+      <Reveal as="section" className="nx-section">
+        <div className="nx-head">
+          <span className="nx-pill">Por qué existimos</span>
+          <h2 className="nx-h2">Una plataforma, no una sala de espera</h2>
+          <p className="nx-sub">Dos preguntas que respondemos con producto, no con frases de pared.</p>
+        </div>
+        <div className="nx-mv-grid">
+          <div className="nx-mv-card nx-mv-card--azul">
+            <div className="nx-mv-icon-wrap">🎯</div>
+            <div className="nx-mv-titulo">Nuestra misión</div>
+            <p className="nx-mv-texto">
+              Brindar atención médica de calidad a través de una plataforma digital
+              que elimina las barreras de acceso a la salud, poniendo al paciente en
+              el centro de cada decisión clínica.
+            </p>
+          </div>
+          <div className="nx-mv-card nx-mv-card--teal">
+            <div className="nx-mv-icon-wrap">🌟</div>
+            <div className="nx-mv-titulo">Nuestra visión</div>
+            <p className="nx-mv-texto">
+              Ser la red de salud digital de referencia en el norte de Chile,
+              reduciendo los tiempos de espera y el costo de acceder a un especialista.
+            </p>
+          </div>
+        </div>
+      </Reveal>
+
+      {/* ════════ STATS GRANDES ════════ */}
+      <Reveal as="section" className="nx-section--soft">
+        <div className="nx-inner">
+          <div className="nx-head">
+            <span className="nx-pill">En números</span>
+            <h2 className="nx-h2">El impacto hasta hoy</h2>
+            <p className="nx-sub">Resultados acumulados desde nuestro primer lanzamiento.</p>
+          </div>
+          <div className="nx-bigstats">
+            {BIG_STATS.map(s => (
+              <div key={s.label} className="nx-bigstat" style={{ '--accent-color': s.color }}>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>{s.icon}</div>
+                <CountStat target={s.num} suffix={s.suffix} className="nx-bigstat-num" />
+                <div className="nx-bigstat-label">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Reveal>
+
+      {/* ════════ VALORES ════════ */}
+      <Reveal as="section" className="nx-section">
+        <div className="nx-head">
+          <span className="nx-pill">Cómo trabajamos</span>
+          <h2 className="nx-h2">Cuatro principios que no negociamos</h2>
+          <p className="nx-sub">Son los criterios contra los que medimos cada decisión de producto.</p>
+        </div>
+        <div className="nx-valores-grid">
           {VALORES.map(v => (
-            <div key={v.titulo} className="nosotros-valor-card">
-              <div className="nosotros-valor-icon">{v.icon}</div>
-              <h3 className="nosotros-valor-titulo">{v.titulo}</h3>
-              <p className="nosotros-valor-desc">{v.desc}</p>
+            <div key={v.titulo} className="nx-valor-card" style={{ background: v.bg }}>
+              <span className="nx-valor-icon">{v.icon}</span>
+              <div className="nx-valor-titulo">{v.titulo}</div>
+              <div className="nx-valor-desc">{v.desc}</div>
             </div>
           ))}
         </div>
-      </div>
+      </Reveal>
 
-      {/* ── EQUIPO MÉDICO ── */}
-      <div className="nosotros-equipo-bg">
-        <div className="nosotros-section">
-          <div className="nosotros-section-header">
-            <span className="nosotros-chip">Profesionales</span>
-            <h2 className="nosotros-section-titulo">Nuestro equipo médico</h2>
-            <p className="nosotros-section-sub">Especialistas comprometidos con tu salud y bienestar</p>
+      {/* ════════ NUESTRA HISTORIA (timeline) ════════ */}
+      <Reveal as="section" className="nx-section--soft">
+        <div className="nx-inner">
+          <div className="nx-head">
+            <span className="nx-pill">Nuestra historia</span>
+            <h2 className="nx-h2">De una idea a una red regional</h2>
+            <p className="nx-sub">Los hitos que marcaron el camino de RedNorte.</p>
           </div>
-          <div className="nosotros-equipo-grid">
-            {EQUIPO.map(m => (
-              <div key={m.nombre} className="nosotros-medico-card">
-                <div className="nosotros-medico-header">
-                  <div className="nosotros-medico-avatar" style={{ background: `linear-gradient(135deg, ${m.color}, ${m.color}99)` }}>
-                    {m.iniciales}
-                  </div>
-                  <div>
-                    <div className="nosotros-medico-nombre">{m.nombre}</div>
-                    <div className="nosotros-medico-especialidad" style={{ color: m.color }}>{m.especialidad}</div>
-                    <div className="nosotros-medico-cargo">{m.cargo}</div>
-                  </div>
-                </div>
-                <p className="nosotros-medico-desc">{m.descripcion}</p>
+          <div className="nx-timeline">
+            {HITOS.map(h => (
+              <div key={h.año} className="nx-tl-item">
+                <div className="nx-tl-dot">{h.icon}</div>
+                <div className="nx-tl-year">{h.año}</div>
+                <div className="nx-tl-titulo">{h.titulo}</div>
+                <div className="nx-tl-desc">{h.desc}</div>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </Reveal>
 
-      {/* ── HORARIOS Y UBICACIÓN ── */}
-      <div className="nosotros-section nosotros-horarios-grid">
-
-        {/* Horarios */}
-        <div>
-          <span className="nosotros-chip">Atención</span>
-          <h2 className="nosotros-section-titulo" style={{ marginTop: 14 }}>Horarios de atención</h2>
-          <div className="nosotros-horarios-list">
-            {HORARIOS.map(h => (
-              <div key={h.dia} className="nosotros-horario-item">
-                <div className="nosotros-horario-dia">
-                  <span className="nosotros-horario-ico">🕐</span>
-                  <span>{h.dia}</span>
-                </div>
-                <span className="nosotros-horario-badge">{h.horario}</span>
-              </div>
-            ))}
-          </div>
-          <div className="nosotros-urgencias-card">
-            <div className="nosotros-urgencias-titulo">🚨 Urgencias 24 horas</div>
-            <p className="nosotros-urgencias-desc">
-              Contamos con servicio de urgencias disponible las 24 horas del día, los 7 días de la semana, incluidos festivos.
-            </p>
-            <div className="nosotros-urgencias-telefono">📞 600 RED NORTE (600 733 6673)</div>
-          </div>
+      {/* ════════ EQUIPO MÉDICO ════════ */}
+      <Reveal as="section" className="nx-section">
+        <div className="nx-head">
+          <span className="nx-pill">Profesionales</span>
+          <h2 className="nx-h2">Nuestro equipo médico</h2>
+          <p className="nx-sub">Especialistas comprometidos con tu salud y bienestar.</p>
         </div>
-
-        {/* Ubicación */}
-        <div>
-          <span className="nosotros-chip nosotros-chip--teal">Dónde estamos</span>
-          <h2 className="nosotros-section-titulo" style={{ marginTop: 14 }}>Nuestra ubicación</h2>
-          <div className="nosotros-mapa">
-            <div className="nosotros-mapa-grid" />
-            <div className="nosotros-mapa-pin">
-              <div className="nosotros-mapa-pin-icon">📍</div>
-              <div className="nosotros-mapa-pin-nombre">RedNorte Clínica Digital</div>
-              <div className="nosotros-mapa-pin-dir">Av. Providencia 1234, Santiago</div>
-            </div>
-          </div>
-          <div className="nosotros-ubicacion-list">
-            {[
-              { icon:'📍', label:'Dirección',        valor:'Av. Providencia 1234, Providencia, Santiago' },
-              { icon:'🚇', label:'Metro',             valor:'Pedro de Valdivia (Línea 1)' },
-              { icon:'🚌', label:'Buses',             valor:'Líneas 210, 505, C02' },
-              { icon:'🚗', label:'Estacionamiento',  valor:'Disponible en el edificio' },
-            ].map(u => (
-              <div key={u.label} className="nosotros-ubicacion-item">
-                <span className="nosotros-ubicacion-ico">{u.icon}</span>
+        <div className="nx-equipo-grid">
+          {EQUIPO.map(m => (
+            <div key={m.nombre} className="nx-medico-card" style={{ '--medico-color': m.color }}>
+              <div className="nx-medico-header">
+                <div className="nx-medico-avatar" style={{ background: `linear-gradient(135deg, ${m.color}, ${m.color}99)` }}>
+                  {m.iniciales}
+                </div>
                 <div>
-                  <div className="nosotros-ubicacion-label">{u.label}</div>
-                  <div className="nosotros-ubicacion-val">{u.valor}</div>
+                  <div className="nx-medico-nombre">{m.nombre}</div>
+                  <div className="nx-medico-especialidad" style={{ color: m.color }}>{m.especialidad}</div>
+                  <div className="nx-medico-cargo">{m.cargo}</div>
                 </div>
               </div>
-            ))}
-          </div>
+              <p className="nx-medico-desc">{m.desc}</p>
+            </div>
+          ))}
         </div>
-      </div>
+      </Reveal>
 
-      {/* ── CTA ── */}
-      {!usuario && (
-        <div className="nosotros-cta-wrap">
-          <div className="nosotros-cta-card">
-            <h3 className="nosotros-cta-titulo">¿Necesitas atención médica?</h3>
-            <p className="nosotros-cta-desc">
-              Regístrate gratis y agenda tu consulta hoy mismo. Nuestros especialistas están listos para atenderte.
-            </p>
-            <div className="nosotros-cta-btns">
-              <Link to="/registro" className="nosotros-cta-btn-primary">Crear cuenta gratis</Link>
-              <Link to="/login"    className="nosotros-cta-btn-ghost">Iniciar sesión</Link>
+      {/* ════════ HORARIOS Y UBICACIÓN ════════ */}
+      <Reveal as="section" className="nx-section--soft">
+        <div className="nx-inner">
+          <div className="nx-head">
+            <span className="nx-pill">Atención</span>
+            <h2 className="nx-h2">Cuándo y dónde encontrarnos</h2>
+          </div>
+          <div className="nx-info-grid">
+            <div className="nx-info-card">
+              <div className="nx-info-card-title">🕐 Horarios de atención</div>
+              {HORARIOS.map(h => (
+                <div key={h.dia} className="nx-horario-row">
+                  <span className="nx-horario-dia">{h.icon} {h.dia}</span>
+                  <span className="nx-horario-valor">{h.valor}</span>
+                </div>
+              ))}
+              <div className="nx-urgencia-banner">
+                <span style={{ fontSize: 22 }}>🚨</span>
+                <div>
+                  <div className="nx-urgencia-label">Urgencias 24/7</div>
+                  <div className="nx-urgencia-tel">600 733 6673</div>
+                </div>
+              </div>
+            </div>
+            <div className="nx-info-card">
+              <div className="nx-info-card-title">📍 Información y cobertura</div>
+              <div className="nx-ubic-item">
+                <span className="nx-ubic-icon">🏢</span>
+                <div><div className="nx-ubic-label">Sede central</div><div className="nx-ubic-val">Av. Providencia 1234, Santiago</div></div>
+              </div>
+              <div className="nx-ubic-item">
+                <span className="nx-ubic-icon">🗺️</span>
+                <div><div className="nx-ubic-label">Cobertura</div><div className="nx-ubic-val">Arica, Iquique, Antofagasta, Copiapó, La Serena</div></div>
+              </div>
+              <div className="nx-ubic-item">
+                <span className="nx-ubic-icon">💻</span>
+                <div><div className="nx-ubic-label">Modalidad</div><div className="nx-ubic-val">100% telemedicina, sin traslados</div></div>
+              </div>
+              <div className="nx-ubic-item">
+                <span className="nx-ubic-icon">💰</span>
+                <div><div className="nx-ubic-label">Costo</div><div className="nx-ubic-val">Gratuito para todos los pacientes registrados</div></div>
+              </div>
             </div>
           </div>
         </div>
+      </Reveal>
+
+      {/* ════════ CTA FINAL ════════ */}
+      {!usuario && (
+        <Reveal className="nx-cta-wrap">
+          <div className="nx-cta">
+            <div className="nx-cta-blob" />
+            <h3 className="nx-cta-titulo">¿Listo para cuidar tu salud?</h3>
+            <p className="nx-cta-desc">
+              Únete a RedNorte hoy. Crea tu cuenta gratis y agenda tu primera consulta
+              médica especializada desde donde estés.
+            </p>
+            <div className="nx-cta-btns">
+              <Link to="/registro" className="nx-cta-btn-primary">Crear cuenta gratis</Link>
+              <Link to="/login" className="nx-cta-btn-ghost">Ya tengo cuenta</Link>
+            </div>
+          </div>
+        </Reveal>
       )}
 
-      <div className="nosotros-footer">
-        © 2026 RedNorte — Clínica Digital · Todos los derechos reservados
-      </div>
     </div>
   );
 }

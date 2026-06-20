@@ -11,9 +11,7 @@ import LoginPage                     from './pages/LoginPage';
 import RegistroPage                  from './pages/RegistroPage';
 import SobreNosotrosPage             from './pages/SobreNosotrosPage';
 import MisConsultasPage              from './pages/MisConsultasPage';
-import NuevaConsultaPage             from './pages/NuevaConsultaPage';
 import EditarConsultaPage            from './pages/EditarConsultaPage';
-import ReservarHoraPage              from './pages/ReservarHoraPage';
 import PerfilPage                    from './pages/PerfilPage';
 import AdminDashboard                from './pages/AdminDashboard';
 import AdminConsultasPage            from './pages/AdminConsultasPage';
@@ -70,9 +68,7 @@ function AppRoutes() {
 
         <Route element={<RutaPrivada />}>
           <Route path="/mis-consultas"       element={<MisConsultasPage />} />
-          <Route path="/nueva-consulta"      element={<NuevaConsultaPage />} />
           <Route path="/editar-consulta/:id" element={<EditarConsultaPage />} />
-          <Route path="/reservar-hora"       element={<ReservarHoraPage />} />
           <Route path="/perfil"              element={<PerfilPage />} />
           <Route path="/agendar"             element={<AgendarPage />} />
         </Route>

@@ -37,7 +37,7 @@ export default function Footer() {
           <ul>
             <li><span>🏠</span><Link to="/">Inicio</Link></li>
             <li><span>📋</span><Link to="/mis-consultas">Mis Consultas</Link></li>
-            <li><span>➕</span><Link to="/nueva-consulta">Nueva Consulta</Link></li>
+            <li><span>➕</span><Link to="/agendar">Agendar Cita</Link></li>
             <li><span>🏥</span><Link to="/sobre-nosotros">Sobre Nosotros</Link></li>
           </ul>
         </div>

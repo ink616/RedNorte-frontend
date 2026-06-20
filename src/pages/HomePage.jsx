@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -26,22 +26,6 @@ const STATS = [
   { num: '100%', label: 'Digital y gratuito', icon: '💻' },
   { num: '<5min', label: 'Para agendar', icon: '⚡' },
 ];
-
-function CountUp({ target, suffix = '' }) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    if (isNaN(target)) return;
-    let start = 0;
-    const step = Math.ceil(target / 40);
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= target) { setVal(target); clearInterval(timer); }
-      else setVal(start);
-    }, 40);
-    return () => clearInterval(timer);
-  }, [target]);
-  return <span>{isNaN(target) ? target : val}{suffix}</span>;
-}
 
 export default function HomePage() {
   const { usuario } = useAuth();

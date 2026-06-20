@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { registrarUsuario } from '../service/api';
 
 // Validar RUT chileno
@@ -31,7 +31,6 @@ function formatearRut(rut) {
 const PASOS = ['Cuenta', 'Datos personales', 'Confirmación'];
 
 export default function RegistroPage() {
-  const navigate = useNavigate();
   const [paso, setPaso]               = useState(0);
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState('');
