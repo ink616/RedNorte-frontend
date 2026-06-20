@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { listarTodasConsultas, actualizarConsultaAdmin, cancelarYReasignar } from '../service/api';
-import Badge from '../components/Badge';
+import Badge from '@rednorte/badge';
 
 export default function AdminReasignacionPage() {
   const [consultas,   setConsultas]   = useState([]);

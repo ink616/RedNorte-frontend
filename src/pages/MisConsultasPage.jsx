@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { listarConsultasPorUsuario } from '../service/api';
-import Badge from '../components/Badge';
+import Badge from '@rednorte/badge';
 
 export default function MisConsultasPage() {
   const { usuario } = useAuth();
