@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import axios from 'axios';
+import { login as loginApi } from '../service/api';
 
 const AuthContext = createContext(null);
 
@@ -18,7 +19,7 @@ export function AuthProvider({ children }) {
       const raw = localStorage.getItem('rednorte_usuario');
       if (!raw) return null;
       const u = JSON.parse(raw);
-      // Al recargar la pagina, re-aplica el token guardado
+      // Al recargar la página, re-aplica el token guardado
       if (u?.token) aplicarToken(u.token);
       return u;
     } catch { return null; }
@@ -30,20 +31,29 @@ export function AuthProvider({ children }) {
     if (u?.token) aplicarToken(u.token);
   };
 
-  const cerrarSesion = () => {
-    setUsuario(null);
+  const login = async (mail, pass) => {
+    const data = await loginApi(mail, pass);
+    iniciarSesion(data);
+    return data;
+  };
+
+  const logout = () => {
     localStorage.removeItem('rednorte_usuario');
+    localStorage.removeItem('rednorte_token');
     aplicarToken(null);
+    setUsuario(null);
   };
 
   const esAdmin  = usuario?.rol?.tag === 'ADMIN';
   const esDoctor = usuario?.rol?.tag === 'DOCTOR';
 
   return (
-    <AuthContext.Provider value={{ usuario, iniciarSesion, cerrarSesion, esAdmin, esDoctor }}>
+    <AuthContext.Provider value={{ usuario, login, iniciarSesion, logout, esAdmin, esDoctor }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() { return useContext(AuthContext); }
+export function useAuth() {
+  return useContext(AuthContext);
+}

@@ -34,7 +34,7 @@ export default function AdminReasignacionPage() {
   return (
     <div className="page">
       <h2 className="page-title">🔄 Reasignación de citas</h2>
-      <p style={{ color: 'var(--text-muted)', marginBottom: 24, fontSize: 14 }}>
+      <p className="page-desc">
         Cancela una cita agendada y el sistema asigna automáticamente el bloque al siguiente paciente pendiente de esa especialidad.
       </p>
 
@@ -42,14 +42,10 @@ export default function AdminReasignacionPage() {
       {exito && <div className="alert alert-success">{exito}</div>}
 
       {/* Citas agendadas */}
-      <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 24 }}>
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 700, fontSize: 15 }}>
-          📅 Citas agendadas — cancelar y reasignar
-        </div>
+      <div className="card card-flush card-mb">
+        <div className="card-header-bar">📅 Citas agendadas — cancelar y reasignar</div>
         {loading ? <div className="spinner">Cargando...</div> : agendadas.length === 0 ? (
-          <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>
-            No hay citas agendadas para reasignar en este momento.
-          </div>
+          <div className="card-empty">No hay citas agendadas para reasignar en este momento.</div>
         ) : (
           <table className="tabla">
             <thead><tr><th>N°</th><th>Paciente</th><th>Especialidad</th><th>Fecha cita</th><th>Motivo cancelación</th><th>Acción</th></tr></thead>
@@ -58,10 +54,10 @@ export default function AdminReasignacionPage() {
                 <tr key={c.id}>
                   <td><strong>#{c.id}</strong></td>
                   <td>{c.nombrePaciente || '—'}</td>
-                  <td style={{ textTransform: 'capitalize' }}>{c.especialidad}</td>
-                  <td style={{ fontSize: 13 }}>{c.fechaCita ? new Date(c.fechaCita).toLocaleDateString('es-CL') : '—'}</td>
+                  <td className="td-capitalize">{c.especialidad}</td>
+                  <td className="td-sm">{c.fechaCita ? new Date(c.fechaCita).toLocaleDateString('es-CL') : '—'}</td>
                   <td>
-                    <input className="form-control" style={{ padding: '6px 10px', fontSize: 13 }}
+                    <input className="form-control input-sm"
                       placeholder="Motivo de cancelación..."
                       value={motivoMap[c.id] || ''}
                       onChange={e => setMotivoMap({ ...motivoMap, [c.id]: e.target.value })} />
@@ -79,12 +75,10 @@ export default function AdminReasignacionPage() {
       </div>
 
       {/* Pendientes */}
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 700, fontSize: 15 }}>
-          ⏳ Consultas pendientes de asignación ({pendientes.length})
-        </div>
+      <div className="card card-flush">
+        <div className="card-header-bar">⏳ Consultas pendientes de asignación ({pendientes.length})</div>
         {loading ? <div className="spinner">Cargando...</div> : pendientes.length === 0 ? (
-          <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>No hay consultas pendientes.</div>
+          <div className="card-empty">No hay consultas pendientes.</div>
         ) : (
           <table className="tabla">
             <thead><tr><th>N°</th><th>Paciente</th><th>Especialidad</th><th>Síntomas</th><th>Fecha solicitud</th><th>Estado</th></tr></thead>
@@ -93,11 +87,11 @@ export default function AdminReasignacionPage() {
                 <tr key={c.id}>
                   <td><strong>#{c.id}</strong></td>
                   <td>{c.nombrePaciente || '—'}</td>
-                  <td style={{ textTransform: 'capitalize', fontWeight: 500 }}>{c.especialidad}</td>
-                  <td style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 180 }}>
+                  <td className="td-capitalize" style={{ fontWeight: 500 }}>{c.especialidad}</td>
+                  <td className="td-muted-max">
                     {c.sintomas ? c.sintomas.slice(0, 60) + (c.sintomas.length > 60 ? '…' : '') : '—'}
                   </td>
-                  <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                  <td className="td-muted">
                     {c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleDateString('es-CL') : '—'}
                   </td>
                   <td><Badge estado={c.estado} /></td>

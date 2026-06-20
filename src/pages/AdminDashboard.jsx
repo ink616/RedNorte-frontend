@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { obtenerResumenEstadisticas, listarTodasConsultas } from '../service/api';
-import Badge from '@rednorte/badge';
 
 export default function AdminDashboard() {
   const [stats,     setStats]     = useState(null);
@@ -22,19 +21,19 @@ export default function AdminDashboard() {
   }, []);
 
   const tarjetas = stats ? [
-    { label: 'Total consultas',      valor: stats.totalConsultas,        color: 'var(--primary)',      bg: 'var(--primary-light)', icon: '📋' },
-    { label: 'Usuarios registrados', valor: stats.totalUsuarios,         color: 'var(--purple)',       bg: 'var(--purple-light)',  icon: '👥' },
-    { label: 'Bloques de agenda',    valor: stats.totalBloquesAgenda,    color: 'var(--teal)',         bg: 'var(--teal-light)',    icon: '📅' },
-    { label: 'Establecimientos',     valor: stats.totalEstablecimientos, color: 'var(--warning-dark)', bg: 'var(--warning-light)', icon: '🏥' },
-    { label: 'Pendientes',           valor: stats.consultasPorEstado?.PENDIENTE || 0, color: 'var(--warning)', bg: 'var(--warning-light)', icon: '⏳' },
-    { label: 'Atendidas',            valor: stats.consultasPorEstado?.ATENDIDA  || 0, color: 'var(--success)', bg: 'var(--success-light)', icon: '✅' },
+    { label: 'Total consultas',      valor: stats.totalConsultas,                       color: 'var(--primary)',       icon: '📋' },
+    { label: 'Usuarios registrados', valor: stats.totalUsuarios,                        color: 'var(--purple)',        icon: '👥' },
+    { label: 'Bloques de agenda',    valor: stats.totalBloquesAgenda,                   color: 'var(--teal)',          icon: '📅' },
+    { label: 'Establecimientos',     valor: stats.totalEstablecimientos,                color: 'var(--warning-dark)',  icon: '🏥' },
+    { label: 'Pendientes',           valor: stats.consultasPorEstado?.PENDIENTE || 0,   color: 'var(--warning)',       icon: '⏳' },
+    { label: 'Atendidas',            valor: stats.consultasPorEstado?.ATENDIDA  || 0,   color: 'var(--success)',       icon: '✅' },
   ] : [];
 
   const DIST = {
     PENDIENTE:  { bg: 'var(--warning-light)', color: 'var(--warning-dark)' },
     AGENDADA:   { bg: 'var(--primary-light)', color: 'var(--primary-dark)' },
-    REASIGNADA: { bg: 'var(--teal-light)',    color: 'var(--teal-dark)' },
-    CANCELADA:  { bg: 'var(--danger-light)',  color: 'var(--danger-dark)' },
+    REASIGNADA: { bg: 'var(--teal-light)',    color: 'var(--teal-dark)'    },
+    CANCELADA:  { bg: 'var(--danger-light)',  color: 'var(--danger-dark)'  },
     ATENDIDA:   { bg: 'var(--success-light)', color: 'var(--success-dark)' },
   };
 
@@ -52,26 +51,27 @@ export default function AdminDashboard() {
 
       {loading ? <div className="spinner">Cargando estadísticas...</div> : (
         <>
-          <div className="grid-3 stagger" style={{ marginBottom: 28 }}>
+          {/* Stats */}
+          <div className="grid-3 admin-stats-section">
             {tarjetas.map(t => (
-              <div key={t.label} className="stat-card" style={{ '--accent-color': t.color }}>
-                <div className="stat-icon" style={{ background: t.bg }}>{t.icon}</div>
-                <div>
-                  <div className="stat-num" style={{ color: t.color }}>{t.valor ?? '-'}</div>
-                  <div className="stat-label">{t.label}</div>
-                </div>
+              <div key={t.label} className="stat-card" style={{ borderTopColor: t.color }}>
+                <div className="stat-icon">{t.icon}</div>
+                <div className="stat-num" style={{ color: t.color }}>{t.valor ?? '—'}</div>
+                <div className="stat-label">{t.label}</div>
               </div>
             ))}
           </div>
 
+          {/* Distribución por estado */}
           {stats?.consultasPorEstado && (
-            <div className="card" style={{ marginBottom: 24 }}>
-              <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 700 }}>Distribución de consultas por estado</h3>
+            <div className="card admin-dist-card">
+              <div className="card-header-bar">Distribución de consultas por estado</div>
               <div className="dist-bar">
                 {Object.entries(stats.consultasPorEstado).map(([estado, count]) => {
-                  const s = DIST[estado] || { bg: 'var(--bg-soft)', color: 'var(--text-soft)' };
+                  const s   = DIST[estado] || { bg: 'var(--bg-soft)', color: 'var(--text-soft)' };
                   const pct = totalEstados ? Math.round((count / totalEstados) * 100) : 0;
                   return (
+                    /* colores dinámicos por estado → inline */
                     <div key={estado} className="dist-item" style={{ background: s.bg }}>
                       <div className="dist-num"   style={{ color: s.color }}>{count}</div>
                       <div className="dist-label" style={{ color: s.color }}>{estado}</div>
@@ -83,7 +83,8 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          <div className="grid-3 stagger" style={{ marginBottom: 24 }}>
+          {/* Accesos rápidos */}
+          <div className="grid-3 admin-shortcuts-section">
             {[
               { to: '/admin/consultas',        icon: '📋', label: 'Consultas',        desc: 'Gestionar todas las citas' },
               { to: '/admin/usuarios',         icon: '👥', label: 'Usuarios',         desc: 'Administrar cuentas' },
@@ -100,34 +101,35 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          <div className="card card-pad-0">
-            <div className="card-header">
-              <span>Últimas consultas ingresadas</span>
-              <Link to="/admin/consultas" style={{ fontSize: 13, color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>Ver todas</Link>
+          {/* Últimas consultas */}
+          <div className="card card-flush">
+            <div className="card-header-bar">
+              <span>🕐 Últimas consultas ingresadas</span>
+              <Link to="/admin/consultas" className="card-header-link">Ver todas →</Link>
             </div>
-            <div className="table-wrap">
-              <table className="tabla">
-                <thead>
-                  <tr><th>N°</th><th>Paciente</th><th>Especialidad</th><th>Estado</th><th>Fecha</th></tr>
-                </thead>
-                <tbody>
-                  {recientes.map(c => (
-                    <tr key={c.id}>
-                      <td className="tabla-id">#{c.id}</td>
-                      <td style={{ fontWeight: 500 }}>{c.nombrePaciente || '-'}</td>
-                      <td style={{ textTransform: 'capitalize', color: 'var(--text-soft)' }}>{c.especialidad}</td>
-                      <td><Badge estado={c.estado} /></td>
-                      <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-                        {c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleDateString('es-CL') : '-'}
-                      </td>
-                    </tr>
-                  ))}
-                  {recientes.length === 0 && (
-                    <tr><td colSpan={5} style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>Sin consultas registradas.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <table className="tabla">
+              <thead>
+                <tr><th>N°</th><th>Paciente</th><th>Especialidad</th><th>Estado</th><th>Fecha</th></tr>
+              </thead>
+              <tbody>
+                {recientes.map(c => (
+                  <tr key={c.id}>
+                    <td><strong>#{c.id}</strong></td>
+                    <td>{c.nombrePaciente || '—'}</td>
+                    <td className="td-capitalize">{c.especialidad}</td>
+                    <td>
+                      <span className={`badge-estado badge-estado-${c.estado?.toLowerCase()}`}>{c.estado}</span>
+                    </td>
+                    <td className="td-muted">
+                      {c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleDateString('es-CL') : '—'}
+                    </td>
+                  </tr>
+                ))}
+                {recientes.length === 0 && (
+                  <tr><td colSpan={5} className="td-empty">Sin consultas aún.</td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </>
       )}
