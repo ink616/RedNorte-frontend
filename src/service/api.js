@@ -165,6 +165,20 @@ export const listarAuditoria = () =>
 export const auditoriaPorUsuario = (usuarioId) =>
   axios.get(`${GW}/auditoria/usuario/${usuarioId}`).then(r => r.data);
 
+// ─── CHATBOT (SaludBot) ───────────────────────────────────────────────────────
+// El endpoint es publico (atiende tambien a visitantes sin cuenta), asi que
+// no depende de que axios tenga el header Authorization configurado: si hay
+// sesion, el JWT ya viaja por el interceptor global de AuthContext; si no,
+// el backend simplemente trata la conversacion como anonima.
+export const enviarMensajeChatbot = (dto) =>
+  axios.post(`${GW}/chatbot/mensaje`, dto).then(r => r.data);
+
+export const obtenerHistorialChatbot = (identificadorConversacion) =>
+  axios.get(`${GW}/chatbot/historial/${identificadorConversacion}`).then(r => r.data);
+
+export const borrarHistorialChatbot = (identificadorConversacion) =>
+  axios.delete(`${GW}/chatbot/historial/${identificadorConversacion}`);
+
 // ─── ALIASES DE COMPATIBILIDAD ───────────────────────────────────────────────
 export const listarBloquesDisponibles = agendaDisponiblePorFecha;
 export const listarBloquesPorDoctor   = agendaPorDoctor;

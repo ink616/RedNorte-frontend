@@ -13,3 +13,4 @@
 @import './css/cards.css';       /* .card, stat, shortcut, hero, login */
 @import './css/nosotros.css';    /* Página Sobre Nosotros */
 @import './css/agendar.css';     /* Wizard Agendar Cita */
+@import './css/chatbot.css';     /* Widget flotante SaludBot */

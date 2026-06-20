@@ -24,6 +24,7 @@ import AdminEstadisticasPage         from './pages/AdminEstadisticasPage';
 import DoctorDashboard               from './pages/DoctorDashboard';
 import DoctorAgendaPage              from './pages/DoctorAgendaPage';
 import NotFoundPage                  from './pages/NotFoundPage';
+import ChatbotWidget                 from './components/ChatbotWidget';
 
 const RutaPrivada = () => {
   const { usuario } = useAuth();
@@ -56,6 +57,9 @@ const RutaPublica = ({ children }) => {
 };
 
 function AppRoutes() {
+  const { esAdmin, esDoctor } = useAuth();
+  const mostrarChatbot = !esAdmin && !esDoctor;
+
   return (
     <>
       <Navbar />
@@ -93,6 +97,7 @@ function AppRoutes() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />
+      {mostrarChatbot && <ChatbotWidget />}
     </>
   );
 }

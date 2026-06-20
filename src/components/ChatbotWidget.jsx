@@ -1,0 +1,316 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { enviarMensajeChatbot, obtenerHistorialChatbot } from '../service/api';
+
+/* ── Utilidades ─────────────────────────────────────────────── */
+
+// Generador de id simple, sin depender de crypto.randomUUID(): esa API
+// requiere un contexto seguro (HTTPS) y no existe en jsdom (entorno de
+// test), asi que un generador propio es mas portable para este uso
+// (un identificador de sesion anonima, no necesita ser criptografico).
+function generarIdAnonimo() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+}
+
+function obtenerOCrearConversacionAnonima() {
+  let id = localStorage.getItem('rednorte_chatbot_anon_id');
+  if (!id) {
+    id = 'anon-' + generarIdAnonimo();
+    localStorage.setItem('rednorte_chatbot_anon_id', id);
+  }
+  return id;
+}
+
+function avatarPara(emocion) {
+  const valido = ['acogedor', 'concentrado', 'celebracion', 'confundido', 'empatico', 'alerta', 'despedida', 'neutral'];
+  const clave = (emocion || 'neutral').toLowerCase();
+  const archivo = valido.includes(clave) ? clave : 'neutral';
+  return `/img/saludbot/${archivo}.png`;
+}
+
+function formatHora(fecha) {
+  return new Date(fecha).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+}
+
+const SUGERENCIAS_INICIALES = [
+  'Quiero agendar una cita',
+  '¿Qué especialidades tienen?',
+  'Olvidé mi contraseña',
+];
+
+// Si la respuesta tarda mas que esto, el avatar muestra "concentrado"
+// en vez del indicador de escritura generico (el backend no notifica
+// un estado intermedio: es una heuristica simple del lado del cliente).
+const UMBRAL_CONCENTRADO_MS = 1500;
+// Tiempo sin que el usuario escriba para mostrar el estado "paciente".
+const UMBRAL_INACTIVIDAD_MS = 35000;
+
+export default function ChatbotWidget() {
+  const { usuario } = useAuth();
+  const navigate = useNavigate();
+
+  const [abierto, setAbierto] = useState(false);
+  const [pantallaCompleta, setPantallaCompleta] = useState(false);
+  const [mensajes, setMensajes] = useState([]);
+  const [texto, setTexto] = useState('');
+  const [enviando, setEnviando] = useState(false);
+  const [mostrarConcentrado, setMostrarConcentrado] = useState(false);
+  const [inactivo, setInactivo] = useState(false);
+  const [emocionActual, setEmocionActual] = useState('acogedor');
+  const [hayMensajeNuevo, setHayMensajeNuevo] = useState(false);
+
+  const scrollRef = useRef(null);
+  const timerConcentradoRef = useRef(null);
+  const timerInactividadRef = useRef(null);
+
+  const identificadorConversacion = usuario?.id || obtenerOCrearConversacionAnonima();
+
+  /* ── Carga del historial al abrir por primera vez ──────────── */
+  useEffect(() => {
+    if (!abierto || mensajes.length > 0) return;
+    obtenerHistorialChatbot(identificadorConversacion)
+      .then(historial => {
+        if (Array.isArray(historial) && historial.length > 0) {
+          setMensajes(historial.map(h => ({
+            rol: h.rol, contenido: h.contenido, fechaHora: h.fechaHora,
+          })));
+        }
+      })
+      .catch(() => { /* si falla, simplemente arranca una conversacion nueva */ });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [abierto]);
+
+  /* ── Scroll automatico al fondo ─────────────────────────────── */
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [mensajes, enviando]);
+
+  /* ── Timer de inactividad ("Paciente") ──────────────────────── */
+  const reiniciarTimerInactividad = useCallback(() => {
+    setInactivo(false);
+    if (timerInactividadRef.current) clearTimeout(timerInactividadRef.current);
+    if (abierto) {
+      timerInactividadRef.current = setTimeout(() => setInactivo(true), UMBRAL_INACTIVIDAD_MS);
+    }
+  }, [abierto]);
+
+  useEffect(() => {
+    reiniciarTimerInactividad();
+    return () => { if (timerInactividadRef.current) clearTimeout(timerInactividadRef.current); };
+  }, [reiniciarTimerInactividad, mensajes]);
+
+  /* ── Envio de mensaje ────────────────────────────────────────── */
+  const enviar = async (textoForzado) => {
+    const contenido = (textoForzado ?? texto).trim();
+    if (!contenido || enviando) return;
+
+    reiniciarTimerInactividad();
+    setHayMensajeNuevo(false);
+
+    const mensajeUsuario = { rol: 'user', contenido, fechaHora: new Date().toISOString() };
+    setMensajes(prev => [...prev, mensajeUsuario]);
+    setTexto('');
+    setEnviando(true);
+
+    timerConcentradoRef.current = setTimeout(() => setMostrarConcentrado(true), UMBRAL_CONCENTRADO_MS);
+
+    try {
+      const dto = {
+        mensaje: contenido,
+        identificadorConversacion,
+        usuarioId: usuario?.id || null,
+        nombrePaciente: usuario?.persona
+          ? `${usuario.persona.apellido1 || ''} ${usuario.persona.apellido2 || ''}`.trim()
+          : null,
+      };
+      const respuesta = await enviarMensajeChatbot(dto);
+
+      setEmocionActual((respuesta.emocion || 'neutral').toLowerCase());
+      setMensajes(prev => [...prev, {
+        rol: 'assistant',
+        contenido: respuesta.respuesta,
+        fechaHora: new Date().toISOString(),
+        accionRealizada: respuesta.accionRealizada,
+        datosAccion: respuesta.datosAccion,
+      }]);
+      if (!abierto) setHayMensajeNuevo(true);
+    } catch {
+      setMensajes(prev => [...prev, {
+        rol: 'assistant',
+        contenido: 'No pude conectarme en este momento. Si necesitas agendar una hora, puedes hacerlo directamente desde "Agendar Cita".',
+        fechaHora: new Date().toISOString(),
+      }]);
+      setEmocionActual('confundido');
+    } finally {
+      clearTimeout(timerConcentradoRef.current);
+      setMostrarConcentrado(false);
+      setEnviando(false);
+    }
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      enviar();
+    }
+  };
+
+  const irARegistro = () => { navigate('/registro'); setAbierto(false); };
+  const irALogin = () => { navigate('/login'); setAbierto(false); };
+  const irAMisConsultas = () => { navigate('/mis-consultas'); setAbierto(false); };
+
+  const avatarMostrado = enviando
+    ? (mostrarConcentrado ? 'concentrado' : emocionActual)
+    : (inactivo ? 'neutral' : emocionActual);
+
+  /* ── Tarjeta de accion especial ─────────────────────────────── */
+  const renderAccion = (msg) => {
+    if (!msg.accionRealizada) return null;
+    if (msg.accionRealizada === 'CITA_AGENDADA') {
+      const d = msg.datosAccion || {};
+      return (
+        <div className="cb-accion-card">
+          <div className="cb-accion-titulo">✅ Cita agendada</div>
+          <div className="cb-accion-detalle">
+            {d.fecha && d.hora ? `Confirmada para el ${d.fecha} a las ${d.hora}.` : 'Tu hora quedó reservada.'}
+          </div>
+          <button className="cb-accion-btn" onClick={irAMisConsultas}>Ver mis consultas</button>
+        </div>
+      );
+    }
+    if (msg.accionRealizada === 'REDIRIGIR_REGISTRO') {
+      return (
+        <div className="cb-accion-card cb-accion-card--info">
+          <div className="cb-accion-titulo">📝 Necesitas una cuenta</div>
+          <div className="cb-accion-detalle">Crear una cuenta toma menos de 2 minutos.</div>
+          <button className="cb-accion-btn" onClick={irARegistro}>Crear cuenta</button>
+        </div>
+      );
+    }
+    if (msg.accionRealizada === 'REDIRIGIR_LOGIN') {
+      return (
+        <div className="cb-accion-card cb-accion-card--info">
+          <div className="cb-accion-titulo">🔑 Inicia sesión</div>
+          <div className="cb-accion-detalle">Te llevamos a la página de inicio de sesión.</div>
+          <button className="cb-accion-btn" onClick={irALogin}>Iniciar sesión</button>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const contenidoVentana = (
+    <div className={`cb-ventana ${pantallaCompleta ? 'cb-pantallacompleta' : ''}`}>
+      <div className="cb-header">
+        <div className="cb-header-avatar">
+          <img src={avatarPara(avatarMostrado)} alt="SaludBot" />
+        </div>
+        <div className="cb-header-info">
+          <div className="cb-header-nombre">SaludBot</div>
+          <div className="cb-header-estado">
+            <span className="cb-header-dot" />
+            <span className="cb-header-estado-texto">En línea</span>
+          </div>
+        </div>
+        <div className="cb-header-btns">
+          <button className="cb-header-btn" onClick={() => setPantallaCompleta(p => !p)}
+            title={pantallaCompleta ? 'Minimizar' : 'Pantalla completa'} aria-label="Pantalla completa">
+            {pantallaCompleta ? '⤡' : '⤢'}
+          </button>
+          <button className="cb-header-btn" onClick={() => { setAbierto(false); setPantallaCompleta(false); }}
+            title="Cerrar" aria-label="Cerrar chat">✕</button>
+        </div>
+      </div>
+
+      <div className="cb-mensajes" ref={scrollRef}>
+        {mensajes.length === 0 && !enviando && (
+          <div className="cb-bienvenida">
+            <div className="cb-bienvenida-avatar">
+              <img src={avatarPara('acogedor')} alt="SaludBot" />
+            </div>
+            <div className="cb-bienvenida-titulo">¡Hola! Soy SaludBot 👋</div>
+            <div className="cb-bienvenida-texto">
+              Puedo ayudarte a agendar una cita médica o resolver dudas sobre RedNorte.
+            </div>
+          </div>
+        )}
+
+        {mensajes.map((msg, i) => (
+          <React.Fragment key={i}>
+            <div className={`cb-fila ${msg.rol === 'user' ? 'cb-fila-usuario' : 'cb-fila-bot'}`}>
+              {msg.rol !== 'user' && (
+                <div className="cb-burbuja-avatar">
+                  <img src={avatarPara(i === mensajes.length - 1 ? avatarMostrado : 'neutral')} alt="" />
+                </div>
+              )}
+              <div>
+                <div className={`cb-burbuja ${msg.rol === 'user' ? 'cb-burbuja-usuario' : 'cb-burbuja-bot'}`}>
+                  {msg.contenido}
+                </div>
+                <div className="cb-burbuja-hora" style={{ textAlign: msg.rol === 'user' ? 'right' : 'left' }}>
+                  {formatHora(msg.fechaHora)}
+                </div>
+              </div>
+            </div>
+            {msg.rol !== 'user' && renderAccion(msg)}
+          </React.Fragment>
+        ))}
+
+        {enviando && (
+          <div className="cb-fila cb-fila-bot">
+            <div className="cb-burbuja-avatar">
+              <img src={avatarPara(mostrarConcentrado ? 'concentrado' : 'neutral')} alt="" />
+            </div>
+            <div className="cb-escribiendo"><span /><span /><span /></div>
+          </div>
+        )}
+      </div>
+
+      {mensajes.length === 0 && (
+        <div className="cb-sugerencias">
+          {SUGERENCIAS_INICIALES.map(s => (
+            <button key={s} className="cb-sugerencia-chip" onClick={() => enviar(s)}>{s}</button>
+          ))}
+        </div>
+      )}
+
+      <div className="cb-pie">
+        <textarea
+          className="cb-input"
+          placeholder="Escribe tu mensaje..."
+          value={texto}
+          onChange={e => { setTexto(e.target.value); reiniciarTimerInactividad(); }}
+          onKeyDown={onKeyDown}
+          rows={1}
+          disabled={enviando}
+        />
+        <button className="cb-enviar-btn" onClick={() => enviar()} disabled={!texto.trim() || enviando} aria-label="Enviar mensaje">
+          ➤
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      <button
+        className="cb-fab"
+        onClick={() => { setAbierto(a => !a); setHayMensajeNuevo(false); }}
+        aria-label="Abrir chat con SaludBot"
+      >
+        <span className="cb-fab-pulso" />
+        <img src={avatarPara(abierto ? avatarMostrado : 'acogedor')} alt="" />
+        {hayMensajeNuevo && !abierto && <span className="cb-fab-badge">1</span>}
+      </button>
+
+      {abierto && (
+        pantallaCompleta
+          ? <div className="cb-overlay-pantallacompleta">{contenidoVentana}</div>
+          : contenidoVentana
+      )}
+    </>
+  );
+}
