@@ -7,6 +7,7 @@ import { AuthProvider } from '../context/AuthContext';
 jest.mock('../service/api', () => ({
   enviarMensajeChatbot: jest.fn(),
   obtenerHistorialChatbot: jest.fn(),
+  borrarHistorialChatbot: jest.fn(),
   login: jest.fn(),
   registrarUsuario: jest.fn(),
 }));
@@ -17,7 +18,7 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
-import { enviarMensajeChatbot, obtenerHistorialChatbot } from '../service/api';
+import { enviarMensajeChatbot, obtenerHistorialChatbot, borrarHistorialChatbot } from '../service/api';
 
 const renderWidget = () => render(
   <MemoryRouter>
@@ -210,5 +211,72 @@ describe('ChatbotWidget', () => {
     fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
 
     await waitFor(() => expect(screen.getByText('¡Hola! ¿En qué te ayudo?')).toBeInTheDocument());
+  });
+
+  test('el boton de borrar esta deshabilitado cuando no hay mensajes', () => {
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    expect(screen.getByLabelText('Borrar conversación')).toBeDisabled();
+  });
+
+  test('al hacer click en borrar, pide confirmacion antes de borrar de verdad', async () => {
+    obtenerHistorialChatbot.mockResolvedValue([
+      { rol: 'user', contenido: 'Hola', fechaHora: '2026-06-20T10:00:00' },
+    ]);
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    await waitFor(() => expect(screen.getByText('Hola')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText('Borrar conversación'));
+
+    expect(screen.getByText(/Borrar toda la conversación/)).toBeInTheDocument();
+    expect(borrarHistorialChatbot).not.toHaveBeenCalled();
+  });
+
+  test('cancelar la confirmacion no borra nada y mantiene los mensajes', async () => {
+    obtenerHistorialChatbot.mockResolvedValue([
+      { rol: 'user', contenido: 'Hola', fechaHora: '2026-06-20T10:00:00' },
+    ]);
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    await waitFor(() => expect(screen.getByText('Hola')).toBeInTheDocument());
+    fireEvent.click(screen.getByLabelText('Borrar conversación'));
+
+    fireEvent.click(screen.getByText('Cancelar'));
+
+    expect(screen.queryByText(/Borrar toda la conversación/)).not.toBeInTheDocument();
+    expect(screen.getByText('Hola')).toBeInTheDocument();
+    expect(borrarHistorialChatbot).not.toHaveBeenCalled();
+  });
+
+  test('confirmar el borrado llama a la API y limpia los mensajes mostrando la bienvenida de nuevo', async () => {
+    obtenerHistorialChatbot.mockResolvedValue([
+      { rol: 'user', contenido: 'Hola', fechaHora: '2026-06-20T10:00:00' },
+      { rol: 'assistant', contenido: '¡Hola! ¿En qué te ayudo?', fechaHora: '2026-06-20T10:00:05' },
+    ]);
+    borrarHistorialChatbot.mockResolvedValue({});
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    await waitFor(() => expect(screen.getByText('Hola')).toBeInTheDocument());
+    fireEvent.click(screen.getByLabelText('Borrar conversación'));
+    fireEvent.click(screen.getByText('Sí, borrar'));
+
+    await waitFor(() => expect(borrarHistorialChatbot).toHaveBeenCalled());
+    await waitFor(() => expect(screen.getByText('¡Hola! Soy SaludBot 👋')).toBeInTheDocument());
+    expect(screen.queryByText('Hola')).not.toBeInTheDocument();
+  });
+
+  test('si borrar falla en el backend, igual limpia la vista local', async () => {
+    obtenerHistorialChatbot.mockResolvedValue([
+      { rol: 'user', contenido: 'Hola', fechaHora: '2026-06-20T10:00:00' },
+    ]);
+    borrarHistorialChatbot.mockRejectedValue(new Error('500'));
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    await waitFor(() => expect(screen.getByText('Hola')).toBeInTheDocument());
+    fireEvent.click(screen.getByLabelText('Borrar conversación'));
+    fireEvent.click(screen.getByText('Sí, borrar'));
+
+    await waitFor(() => expect(screen.getByText('¡Hola! Soy SaludBot 👋')).toBeInTheDocument());
   });
 });

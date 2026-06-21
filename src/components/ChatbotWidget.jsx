@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { enviarMensajeChatbot, obtenerHistorialChatbot } from '../service/api';
+import { enviarMensajeChatbot, obtenerHistorialChatbot, borrarHistorialChatbot } from '../service/api';
 import ChatbotAccionModal from './ChatbotAccionModal';
 
 /* ── Utilidades ─────────────────────────────────────────────── */
@@ -61,6 +61,8 @@ export default function ChatbotWidget() {
   const [emocionActual, setEmocionActual] = useState('acogedor');
   const [hayMensajeNuevo, setHayMensajeNuevo] = useState(false);
   const [modalAccion, setModalAccion] = useState(null); // null | 'REGISTRO' | 'LOGIN'
+  const [confirmarBorrado, setConfirmarBorrado] = useState(false);
+  const [borrando, setBorrando] = useState(false);
 
   const scrollRef = useRef(null);
   const timerConcentradoRef = useRef(null);
@@ -174,6 +176,23 @@ export default function ChatbotWidget() {
   const irALogin = () => setModalAccion('LOGIN');
   const irAMisConsultas = () => { navigate('/mis-consultas'); setAbierto(false); };
 
+  /* ── Borrar el historial de la conversacion actual ───────────── */
+  const handleBorrarHistorial = async () => {
+    setBorrando(true);
+    try {
+      await borrarHistorialChatbot(identificadorConversacion);
+    } catch {
+      // Si la llamada falla (ej. backend caido), igual se limpia la
+      // vista local: el usuario ve una conversacion nueva, que es el
+      // resultado que espera al pedir "borrar el chat".
+    } finally {
+      setMensajes([]);
+      setEmocionActual('acogedor');
+      setConfirmarBorrado(false);
+      setBorrando(false);
+    }
+  };
+
   /* ── Maneja el cierre exitoso del modal de registro/login ──── */
   const manejarExitoModal = useCallback(({ tipo }) => {
     setModalAccion(null);
@@ -242,6 +261,10 @@ export default function ChatbotWidget() {
           </div>
         </div>
         <div className="cb-header-btns">
+          <button className="cb-header-btn" onClick={() => setConfirmarBorrado(true)}
+            title="Borrar conversación" aria-label="Borrar conversación" disabled={mensajes.length === 0}>
+            🗑️
+          </button>
           <button className="cb-header-btn" onClick={() => setPantallaCompleta(p => !p)}
             title={pantallaCompleta ? 'Minimizar' : 'Pantalla completa'} aria-label="Pantalla completa">
             {pantallaCompleta ? '⤡' : '⤢'}
@@ -250,6 +273,20 @@ export default function ChatbotWidget() {
             title="Cerrar" aria-label="Cerrar chat">✕</button>
         </div>
       </div>
+
+      {confirmarBorrado && (
+        <div className="cb-confirmar-borrado">
+          <span className="cb-confirmar-borrado-texto">¿Borrar toda la conversación? No se puede deshacer.</span>
+          <div className="cb-confirmar-borrado-btns">
+            <button className="cb-confirmar-borrado-cancelar" onClick={() => setConfirmarBorrado(false)} disabled={borrando}>
+              Cancelar
+            </button>
+            <button className="cb-confirmar-borrado-aceptar" onClick={handleBorrarHistorial} disabled={borrando}>
+              {borrando ? 'Borrando...' : 'Sí, borrar'}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="cb-mensajes" ref={scrollRef}>
         {mensajes.length === 0 && !enviando && (
