@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import ChatbotAccionModal from './ChatbotAccionModal';
 import { AuthProvider } from '../context/AuthContext';
 
@@ -16,22 +16,35 @@ const renderModal = (props = {}) => render(
   </AuthProvider>
 );
 
+const llenarRegistroValido = () => {
+  fireEvent.change(screen.getByPlaceholderText('tu@correo.cl'), { target: { value: 'nuevo@correo.cl' } });
+  fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'Clave1234' } });
+  fireEvent.change(screen.getByPlaceholderText('Repite tu contraseña'), { target: { value: 'Clave1234' } });
+  fireEvent.change(screen.getByPlaceholderText('González'), { target: { value: 'Pérez' } });
+  fireEvent.change(screen.getByPlaceholderText('12.345.678-9'), { target: { value: '12345678-5' } }); // RUT valido
+  fireEvent.change(document.querySelector('input[type="date"]'), { target: { value: '1995-05-20' } });
+  fireEvent.change(screen.getByDisplayValue('Selecciona...'), { target: { value: 'F' } });
+};
+
 beforeEach(() => {
   jest.clearAllMocks();
   localStorage.clear();
 });
 
 describe('ChatbotAccionModal', () => {
-  test('tipo REGISTRO muestra el formulario de creación de cuenta', () => {
+  test('tipo REGISTRO muestra el formulario completo de creación de cuenta', () => {
     renderModal({ tipo: 'REGISTRO' });
     expect(screen.getByText('Crea tu cuenta gratis')).toBeInTheDocument();
     expect(screen.getByText('Primer apellido')).toBeInTheDocument();
+    expect(screen.getByText('Fecha de nacimiento')).toBeInTheDocument();
+    expect(screen.getByText('Sexo')).toBeInTheDocument();
   });
 
   test('tipo LOGIN muestra solo correo y contraseña, sin campos de registro', () => {
     renderModal({ tipo: 'LOGIN' });
     expect(screen.getByText('Inicia sesión')).toBeInTheDocument();
     expect(screen.queryByText('Primer apellido')).not.toBeInTheDocument();
+    expect(screen.queryByText('Fecha de nacimiento')).not.toBeInTheDocument();
   });
 
   test('el boton de cerrar invoca onCerrar', () => {
@@ -48,12 +61,25 @@ describe('ChatbotAccionModal', () => {
     expect(onCerrar).toHaveBeenCalled();
   });
 
+  test('REGISTRO con contraseñas que no coinciden muestra error y no llama a registrarUsuario', async () => {
+    renderModal({ tipo: 'REGISTRO' });
+    fireEvent.change(screen.getByPlaceholderText('tu@correo.cl'), { target: { value: 'nuevo@correo.cl' } });
+    fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'Clave1234' } });
+    fireEvent.change(screen.getByPlaceholderText('Repite tu contraseña'), { target: { value: 'OtraClave' } });
+
+    fireEvent.click(screen.getByText('🎉 Crear cuenta'));
+
+    await waitFor(() => expect(document.querySelector('.cb-modal-error').textContent).toMatch(/no coinciden/));
+    expect(registrarUsuario).not.toHaveBeenCalled();
+  });
+
   test('REGISTRO con RUT invalido muestra error y no llama a registrarUsuario', async () => {
     renderModal({ tipo: 'REGISTRO' });
     fireEvent.change(screen.getByPlaceholderText('tu@correo.cl'), { target: { value: 'nuevo@correo.cl' } });
     fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'Clave1234' } });
+    fireEvent.change(screen.getByPlaceholderText('Repite tu contraseña'), { target: { value: 'Clave1234' } });
     fireEvent.change(screen.getByPlaceholderText('González'), { target: { value: 'Pérez' } });
-    fireEvent.change(screen.getByPlaceholderText('12.345.678-9'), { target: { value: '11111111-9' } }); // DV incorrecto
+    fireEvent.change(screen.getByPlaceholderText('12.345.678-9'), { target: { value: '11111111-9' } }); // DV correcto es 1, no 9
 
     fireEvent.click(screen.getByText('🎉 Crear cuenta'));
 
@@ -66,17 +92,14 @@ describe('ChatbotAccionModal', () => {
     const onExito = jest.fn();
     renderModal({ tipo: 'REGISTRO', onExito });
 
-    fireEvent.change(screen.getByPlaceholderText('tu@correo.cl'), { target: { value: 'nuevo@correo.cl' } });
-    fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'Clave1234' } });
-    fireEvent.change(screen.getByPlaceholderText('González'), { target: { value: 'Pérez' } });
-    fireEvent.change(screen.getByPlaceholderText('12.345.678-9'), { target: { value: '12345678-5' } }); // RUT valido
-
+    llenarRegistroValido();
     fireEvent.click(screen.getByText('🎉 Crear cuenta'));
 
     await waitFor(() => expect(screen.getByText('¡Cuenta creada con éxito!')).toBeInTheDocument());
     expect(registrarUsuario).toHaveBeenCalledWith(expect.objectContaining({
       mail: 'nuevo@correo.cl',
       rol: expect.objectContaining({ tag: 'PACIENTE' }),
+      persona: expect.objectContaining({ apellido1: 'Pérez', sexo: 'F' }),
     }));
 
     await waitFor(() => expect(onExito).toHaveBeenCalledWith({ tipo: 'REGISTRO' }), { timeout: 2000 });
@@ -86,14 +109,16 @@ describe('ChatbotAccionModal', () => {
     registrarUsuario.mockRejectedValue(new Error('409'));
     renderModal({ tipo: 'REGISTRO' });
 
-    fireEvent.change(screen.getByPlaceholderText('tu@correo.cl'), { target: { value: 'existe@correo.cl' } });
-    fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'Clave1234' } });
-    fireEvent.change(screen.getByPlaceholderText('González'), { target: { value: 'Pérez' } });
-    fireEvent.change(screen.getByPlaceholderText('12.345.678-9'), { target: { value: '12345678-5' } });
-
+    llenarRegistroValido();
     fireEvent.click(screen.getByText('🎉 Crear cuenta'));
 
     await waitFor(() => expect(screen.getByText(/correo ya puede estar en uso/)).toBeInTheDocument());
+  });
+
+  test('muestra la fortaleza de la contraseña a medida que se escribe', () => {
+    renderModal({ tipo: 'REGISTRO' });
+    fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'Clave1234!' } });
+    expect(screen.getByText('Contraseña Fuerte')).toBeInTheDocument();
   });
 
   test('LOGIN exitoso llama a onExito con tipo LOGIN', async () => {

@@ -255,11 +255,15 @@
 .cb-modal-card {
   position: relative;
   width: 100%; max-width: 420px;
+  max-height: 92vh; overflow-y: auto;
   background: var(--card); border-radius: var(--radius-lg);
   box-shadow: 0 24px 70px rgba(0,0,0,0.35);
   padding: 32px 28px 28px;
   animation: cbModalAparecer 0.4s cubic-bezier(0.16,1,0.3,1);
 }
+.cb-modal-card::-webkit-scrollbar { width: 6px; }
+.cb-modal-card::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.cb-modal-card--registro { max-width: 460px; }
 @keyframes cbModalAparecer {
   0%   { opacity: 0; transform: translateY(24px) scale(0.92); }
   60%  { transform: translateY(-4px) scale(1.01); }
