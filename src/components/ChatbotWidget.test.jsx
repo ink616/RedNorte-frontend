@@ -7,6 +7,8 @@ import { AuthProvider } from '../context/AuthContext';
 jest.mock('../service/api', () => ({
   enviarMensajeChatbot: jest.fn(),
   obtenerHistorialChatbot: jest.fn(),
+  login: jest.fn(),
+  registrarUsuario: jest.fn(),
 }));
 
 const mockNavigate = jest.fn();
@@ -117,7 +119,7 @@ describe('ChatbotWidget', () => {
     expect(screen.getByText('Ver mis consultas')).toBeInTheDocument();
   });
 
-  test('cuando se requiere registro, muestra la tarjeta con boton de crear cuenta', async () => {
+  test('cuando se requiere registro, el modal de registro se abre automaticamente', async () => {
     enviarMensajeChatbot.mockResolvedValue({
       respuesta: 'Necesitas crear una cuenta primero.',
       accionRealizada: 'REDIRIGIR_REGISTRO',
@@ -128,9 +130,40 @@ describe('ChatbotWidget', () => {
     fireEvent.change(screen.getByPlaceholderText('Escribe tu mensaje...'), { target: { value: 'Quiero agendar' } });
     fireEvent.click(screen.getByLabelText('Enviar mensaje'));
 
+    await waitFor(() => expect(screen.getByText('Crea tu cuenta gratis')).toBeInTheDocument());
+  });
+
+  test('cuando se requiere login, el modal de inicio de sesion se abre automaticamente', async () => {
+    enviarMensajeChatbot.mockResolvedValue({
+      respuesta: 'Te ayudo a iniciar sesión.',
+      accionRealizada: 'REDIRIGIR_LOGIN',
+      emocion: 'NEUTRAL',
+    });
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu mensaje...'), { target: { value: 'No puedo entrar' } });
+    fireEvent.click(screen.getByLabelText('Enviar mensaje'));
+
+    await waitFor(() => expect(screen.getByText('Inicia sesión')).toBeInTheDocument());
+  });
+
+  test('la tarjeta de "necesitas una cuenta" tambien abre el modal al hacer click en su boton', async () => {
+    enviarMensajeChatbot.mockResolvedValue({
+      respuesta: 'Necesitas crear una cuenta primero.',
+      accionRealizada: 'REDIRIGIR_REGISTRO',
+      emocion: 'NEUTRAL',
+    });
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu mensaje...'), { target: { value: 'Quiero agendar' } });
+    fireEvent.click(screen.getByLabelText('Enviar mensaje'));
     await waitFor(() => expect(screen.getByText('📝 Necesitas una cuenta')).toBeInTheDocument());
+
+    // Cerrar el modal que ya se abrio solo, y volver a abrirlo desde la tarjeta
+    fireEvent.click(screen.getByLabelText('Cerrar'));
     fireEvent.click(screen.getByText('Crear cuenta'));
-    expect(mockNavigate).toHaveBeenCalledWith('/registro');
+
+    expect(screen.getByText('Crea tu cuenta gratis')).toBeInTheDocument();
   });
 
   test('si la peticion falla, muestra un mensaje de respaldo sin romper el widget', async () => {

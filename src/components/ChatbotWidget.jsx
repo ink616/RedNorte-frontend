@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { enviarMensajeChatbot, obtenerHistorialChatbot } from '../service/api';
+import ChatbotAccionModal from './ChatbotAccionModal';
 
 /* ── Utilidades ─────────────────────────────────────────────── */
 
@@ -59,6 +60,7 @@ export default function ChatbotWidget() {
   const [inactivo, setInactivo] = useState(false);
   const [emocionActual, setEmocionActual] = useState('acogedor');
   const [hayMensajeNuevo, setHayMensajeNuevo] = useState(false);
+  const [modalAccion, setModalAccion] = useState(null); // null | 'REGISTRO' | 'LOGIN'
 
   const scrollRef = useRef(null);
   const timerConcentradoRef = useRef(null);
@@ -137,6 +139,16 @@ export default function ChatbotWidget() {
         datosAccion: respuesta.datosAccion,
       }]);
       if (!abierto) setHayMensajeNuevo(true);
+
+      // El modal se abre solo, sin esperar a que el paciente toque un
+      // boton: es la forma mas directa de cumplir lo que pidio SaludBot,
+      // manteniendolo dentro del contexto del chat en vez de navegar a
+      // otra pagina y perder la conversacion.
+      if (respuesta.accionRealizada === 'REDIRIGIR_REGISTRO') {
+        setModalAccion('REGISTRO');
+      } else if (respuesta.accionRealizada === 'REDIRIGIR_LOGIN') {
+        setModalAccion('LOGIN');
+      }
     } catch {
       setMensajes(prev => [...prev, {
         rol: 'assistant',
@@ -158,9 +170,23 @@ export default function ChatbotWidget() {
     }
   };
 
-  const irARegistro = () => { navigate('/registro'); setAbierto(false); };
-  const irALogin = () => { navigate('/login'); setAbierto(false); };
+  const irARegistro = () => setModalAccion('REGISTRO');
+  const irALogin = () => setModalAccion('LOGIN');
   const irAMisConsultas = () => { navigate('/mis-consultas'); setAbierto(false); };
+
+  /* ── Maneja el cierre exitoso del modal de registro/login ──── */
+  const manejarExitoModal = useCallback(({ tipo }) => {
+    setModalAccion(null);
+    const mensajeConfirmacion = tipo === 'REGISTRO'
+      ? '✅ ¡Tu cuenta fue creada con éxito! Ya puedes seguir contándome qué necesitas, por ejemplo, agendar tu cita.'
+      : '✅ ¡Sesión iniciada correctamente! Sigamos donde quedamos.';
+    setMensajes(prev => [...prev, {
+      rol: 'assistant',
+      contenido: mensajeConfirmacion,
+      fechaHora: new Date().toISOString(),
+    }]);
+    setEmocionActual('celebracion');
+  }, []);
 
   const avatarMostrado = enviando
     ? (mostrarConcentrado ? 'concentrado' : emocionActual)
@@ -310,6 +336,14 @@ export default function ChatbotWidget() {
         pantallaCompleta
           ? <div className="cb-overlay-pantallacompleta">{contenidoVentana}</div>
           : contenidoVentana
+      )}
+
+      {modalAccion && (
+        <ChatbotAccionModal
+          tipo={modalAccion}
+          onCerrar={() => setModalAccion(null)}
+          onExito={manejarExitoModal}
+        />
       )}
     </>
   );
