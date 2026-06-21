@@ -29,9 +29,17 @@ beforeEach(() => {
 });
 
 describe('RegistroPage', () => {
-  test('arranca en el paso 0 (datos de acceso)', () => {
+  test('arranca en el paso 0 mostrando los campos de acceso', () => {
+    renderPagina();
+    expect(screen.getByPlaceholderText('tu@correo.cl')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Mínimo 8 caracteres')).toBeInTheDocument();
+  });
+
+  test('muestra el panel visual con los 3 pasos del proceso', () => {
     renderPagina();
     expect(screen.getByText('Datos de acceso')).toBeInTheDocument();
+    expect(screen.getByText('Datos personales')).toBeInTheDocument();
+    expect(screen.getByText('Confirmación')).toBeInTheDocument();
   });
 
   test('no avanza si el correo no tiene @', () => {
@@ -55,13 +63,20 @@ describe('RegistroPage', () => {
     fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'Clave1234' } });
     fireEvent.change(screen.getByPlaceholderText('Repite tu contraseña'), { target: { value: 'Otra5678' } });
     fireEvent.click(screen.getByText('Siguiente →'));
-    expect(document.querySelector('.alert-error').textContent).toMatch(/no coinciden/);
+    expect(document.querySelector('.rg-error-box').textContent).toMatch(/no coinciden/);
   });
 
   test('muestra la fortaleza de la contraseña a medida que se escribe', () => {
     renderPagina();
     fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'Clave1234!' } });
     expect(screen.getByText('Contraseña Fuerte')).toBeInTheDocument();
+  });
+
+  test('muestra un check verde cuando las contraseñas coinciden', () => {
+    renderPagina();
+    fireEvent.change(screen.getByPlaceholderText('Mínimo 8 caracteres'), { target: { value: 'Clave1234' } });
+    fireEvent.change(screen.getByPlaceholderText('Repite tu contraseña'), { target: { value: 'Clave1234' } });
+    expect(screen.getByText(/Las contraseñas coinciden/)).toBeInTheDocument();
   });
 
   test('el boton de mostrar/ocultar contraseña cambia el tipo de input', () => {
@@ -76,7 +91,8 @@ describe('RegistroPage', () => {
     renderPagina();
     llenarPaso0Valido();
     fireEvent.click(screen.getByText('Siguiente →'));
-    expect(screen.getByRole('heading', { name: 'Datos personales' })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('González')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('12.345.678-9')).toBeInTheDocument();
   });
 
   test('rechaza un RUT invalido en el paso 1', () => {
@@ -104,6 +120,16 @@ describe('RegistroPage', () => {
     expect(inputRut).toHaveValue('12.345.678-5');
   });
 
+  test('muestra un check verde cuando el RUT es valido', () => {
+    renderPagina();
+    llenarPaso0Valido();
+    fireEvent.click(screen.getByText('Siguiente →'));
+
+    fireEvent.change(screen.getByPlaceholderText('12.345.678-9'), { target: { value: '123456785' } });
+
+    expect(screen.getByText(/RUT válido/)).toBeInTheDocument();
+  });
+
   test('avanza al paso 2 (confirmacion) con un RUT valido', () => {
     renderPagina();
     llenarPaso0Valido();
@@ -111,21 +137,21 @@ describe('RegistroPage', () => {
     llenarPaso1Valido();
     fireEvent.click(screen.getByText('Siguiente →'));
 
-    expect(screen.getByRole('heading', { name: 'Confirma tus datos' })).toBeInTheDocument();
     expect(screen.getByText('nuevo@correo.cl')).toBeInTheDocument();
+    expect(screen.getByText(/datos están protegidos/)).toBeInTheDocument();
   });
 
   test('el boton "Volver" retrocede un paso', () => {
     renderPagina();
     llenarPaso0Valido();
     fireEvent.click(screen.getByText('Siguiente →'));
-    expect(screen.getByRole('heading', { name: 'Datos personales' })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('González')).toBeInTheDocument();
 
     fireEvent.click(screen.getByText('← Volver'));
-    expect(screen.getByRole('heading', { name: 'Datos de acceso' })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('tu@correo.cl')).toBeInTheDocument();
   });
 
-  test('crea la cuenta exitosamente y muestra la pantalla de exito', async () => {
+  test('crea la cuenta exitosamente y muestra la pantalla de exito con confeti', async () => {
     registrarUsuario.mockResolvedValue({});
     renderPagina();
     llenarPaso0Valido();
@@ -139,7 +165,8 @@ describe('RegistroPage', () => {
       mail: 'nuevo@correo.cl',
       rol: expect.objectContaining({ tag: 'PACIENTE' }),
     })));
-    await waitFor(() => expect(screen.getByText('¡Cuenta creada!')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('¡Cuenta creada con éxito!')).toBeInTheDocument());
+    expect(screen.getByText('Iniciar sesión →')).toBeInTheDocument();
   });
 
   test('si el registro falla, muestra un mensaje de error', async () => {

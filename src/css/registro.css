@@ -1,0 +1,197 @@
+/* ════════════════════════════════════════════════════════════
+   REGISTRO — RedNorte
+   Panel visual + wizard de 3 pasos con transiciones animadas,
+   validacion en tiempo real, fortaleza de contrasena animada,
+   y pantalla de exito con confetti.
+   ════════════════════════════════════════════════════════════ */
+
+.rg-layout {
+  display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh;
+}
+@media (max-width: 880px) {
+  .rg-layout { grid-template-columns: 1fr; }
+  .rg-panel-visual { display: none; }
+}
+
+/* ─── Panel visual (igual lenguaje que LoginPage) ───────────── */
+.rg-panel-visual {
+  background: var(--grad-hero);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 3rem; position: relative; overflow: hidden;
+}
+.rg-blob-1 { position: absolute; top: -120px; right: -100px; width: 380px; height: 380px; border-radius: 50%; background: rgba(94,234,212,0.07); animation: rgFloat 9s ease-in-out infinite; }
+.rg-blob-2 { position: absolute; bottom: -100px; left: -80px; width: 300px; height: 300px; border-radius: 50%; background: rgba(37,99,235,0.09); animation: rgFloat 11s ease-in-out infinite reverse; }
+@keyframes rgFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+
+.rg-panel-logo { height: 110px; margin-bottom: 24px; filter: drop-shadow(0 8px 32px rgba(94,234,212,0.3)); position: relative; z-index: 1; }
+.rg-panel-titulo { color: white; font-size: 30px; font-weight: 900; text-align: center; margin-bottom: 6px; position: relative; z-index: 1; }
+.rg-panel-titulo span { color: #5eead4; }
+.rg-panel-sub { color: rgba(255,255,255,0.6); font-size: 12.5px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 36px; position: relative; z-index: 1; }
+
+.rg-panel-pasos { display: flex; flex-direction: column; gap: 18px; width: 100%; max-width: 320px; position: relative; z-index: 1; }
+.rg-panel-paso { display: flex; gap: 14px; align-items: flex-start; opacity: 0.45; transition: var(--transition); }
+.rg-panel-paso.activo { opacity: 1; }
+.rg-panel-paso-num {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Sora', sans-serif; font-weight: 800; font-size: 13px;
+  background: rgba(255,255,255,0.1); color: white; border: 1.5px solid rgba(255,255,255,0.25);
+  transition: var(--transition);
+}
+.rg-panel-paso.activo .rg-panel-paso-num { background: #5eead4; color: #0f172a; border-color: transparent; box-shadow: 0 0 0 4px rgba(94,234,212,0.2); }
+.rg-panel-paso.completado .rg-panel-paso-num { background: var(--success); color: white; border-color: transparent; }
+.rg-panel-paso-texto { color: white; font-weight: 700; font-size: 13.5px; margin-bottom: 2px; }
+.rg-panel-paso-desc { color: rgba(255,255,255,0.55); font-size: 12px; line-height: 1.5; }
+
+/* ─── Panel de formulario ───────────────────────────────────── */
+.rg-panel-form {
+  background: var(--card); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; padding: 3rem 2rem;
+}
+.rg-form-inner { width: 100%; max-width: 420px; }
+
+.rg-form-titulo { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.rg-form-sub { color: var(--text-muted); font-size: 13.5px; margin-bottom: 28px; }
+
+/* ─── Stepper compacto (version movil del panel) ────────────── */
+.rg-stepper-mobile { display: none; gap: 8px; margin-bottom: 24px; }
+@media (max-width: 880px) {
+  .rg-stepper-mobile { display: flex; }
+}
+.rg-stepper-mobile-seg { flex: 1; height: 4px; border-radius: 4px; background: var(--border); overflow: hidden; }
+.rg-stepper-mobile-seg.activo, .rg-stepper-mobile-seg.completado { background: var(--grad-primary); }
+
+.rg-error-box {
+  background: var(--danger-light); color: var(--danger-dark);
+  border-radius: 10px; padding: 12px 16px; font-size: 13px; margin-bottom: 20px;
+  animation: rgPopIn 0.25s ease;
+}
+
+@keyframes rgPopIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes rgSlideIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rg-paso-contenido { animation: none !important; }
+}
+
+.rg-paso-contenido { animation: rgSlideIn 0.32s cubic-bezier(0.16,1,0.3,1); }
+
+.rg-campo { margin-bottom: 18px; }
+.rg-campo-label {
+  font-size: 11.5px; font-weight: 700; color: var(--text-soft);
+  letter-spacing: 0.5px; text-transform: uppercase; display: block; margin-bottom: 8px;
+}
+.rg-input-wrap { position: relative; }
+.rg-input {
+  width: 100%; padding: 12px 16px; font-size: 14.5px; box-sizing: border-box;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  background: var(--bg-soft); color: var(--text); outline: none;
+  transition: var(--transition-fast); font-family: inherit;
+}
+.rg-input:focus { border-color: var(--primary); background: var(--card); }
+.rg-input.rg-input--valido { border-color: var(--success); }
+.rg-input.rg-input--invalido { border-color: var(--danger); }
+.rg-input--pass { padding-right: 46px; }
+
+.rg-check-icono {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 14px; animation: rgPopIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.rg-pass-toggle {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; font-size: 17px; padding: 4px;
+}
+
+.rg-hint { font-size: 12px; margin-top: 6px; display: flex; align-items: center; gap: 5px; animation: rgPopIn 0.2s ease; }
+.rg-hint--error { color: var(--danger-dark); }
+.rg-hint--ok { color: var(--success-dark); }
+
+/* ─── Fortaleza de contraseña animada ───────────────────────── */
+.rg-fortaleza { margin-top: 10px; animation: rgPopIn 0.25s ease; }
+.rg-fortaleza-bar { display: flex; gap: 4px; margin-bottom: 6px; }
+.rg-fortaleza-seg {
+  flex: 1; height: 5px; border-radius: 3px; background: var(--border);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+.rg-fortaleza-seg.activo { transform: scaleY(1.3); }
+.rg-fortaleza-label { font-size: 11.5px; font-weight: 700; }
+
+.rg-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 480px) { .rg-grid-2 { grid-template-columns: 1fr; } }
+
+/* ─── Confirmacion ───────────────────────────────────────────── */
+.rg-confirm-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 12px 0; border-bottom: 1px solid var(--border-soft);
+  animation: rgPopIn 0.3s ease backwards;
+}
+.rg-confirm-label { font-size: 12.5px; color: var(--text-muted); }
+.rg-confirm-valor { font-size: 13.5px; font-weight: 700; color: var(--text); text-align: right; }
+
+.rg-aviso-seguridad {
+  margin-top: 18px; padding: 14px 16px; border-radius: 10px;
+  background: var(--primary-light); color: var(--primary-dark);
+  font-size: 12.5px; display: flex; gap: 10px; align-items: flex-start; line-height: 1.5;
+}
+
+/* ─── Botones de navegacion del wizard ──────────────────────── */
+.rg-botones { display: flex; gap: 12px; margin-top: 28px; }
+.rg-btn-volver {
+  padding: 13px 20px; border-radius: 10px; border: 1.5px solid var(--border);
+  background: var(--card); color: var(--text-soft); font-weight: 700; font-size: 14px;
+  cursor: pointer; transition: var(--transition-fast); flex-shrink: 0;
+}
+.rg-btn-volver:hover { background: var(--bg-soft); }
+.rg-btn-siguiente {
+  flex: 1; padding: 13px 20px; border-radius: 10px; border: none;
+  background: var(--grad-primary); color: white; font-weight: 800; font-size: 14.5px;
+  cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-glow);
+}
+.rg-btn-siguiente:hover:not(:disabled) { transform: translateY(-2px); }
+.rg-btn-siguiente:disabled { opacity: 0.55; cursor: wait; transform: none; }
+
+.rg-login-hint { text-align: center; margin-top: 24px; font-size: 13.5px; color: var(--text-muted); }
+.rg-login-hint a { color: var(--primary); font-weight: 700; text-decoration: none; }
+
+/* ─── Pantalla de exito ──────────────────────────────────────── */
+.rg-exito-wrap {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: var(--bg-soft); padding: 24px;
+}
+.rg-exito-card {
+  background: var(--card); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+  padding: 56px 44px; text-align: center; max-width: 440px; position: relative; overflow: hidden;
+  animation: rgExitoAparecer 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes rgExitoAparecer {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.rg-exito-icono-wrap {
+  width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 22px;
+  background: var(--success-light); display: flex; align-items: center; justify-content: center;
+  font-size: 42px; position: relative;
+  animation: rgExitoBounce 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.1s backwards;
+}
+@keyframes rgExitoBounce { 0% { transform: scale(0); opacity: 0; } 60% { transform: scale(1.18); } 100% { transform: scale(1); opacity: 1; } }
+
+.rg-confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.rg-confetti span {
+  position: absolute; top: -10px; font-size: 18px; opacity: 0;
+  animation: rgConfettiFall 2s ease-in forwards;
+}
+@keyframes rgConfettiFall {
+  0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(420px) rotate(320deg); }
+}
+
+.rg-exito-titulo { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+.rg-exito-desc { color: var(--text-soft); font-size: 14.5px; line-height: 1.6; margin-bottom: 28px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rg-exito-card, .rg-exito-icono-wrap, .rg-confetti { animation: none !important; }
+  .rg-confetti { display: none; }
+}
