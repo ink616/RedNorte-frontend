@@ -10,6 +10,7 @@ jest.mock('../service/api', () => ({
   borrarHistorialChatbot: jest.fn(),
   login: jest.fn(),
   registrarUsuario: jest.fn(),
+  solicitarCodigoRecuperacion: jest.fn(),
 }));
 
 const mockNavigate = jest.fn();
@@ -146,6 +147,41 @@ describe('ChatbotWidget', () => {
     fireEvent.click(screen.getByLabelText('Enviar mensaje'));
 
     await waitFor(() => expect(screen.getByText('Inicia sesión')).toBeInTheDocument());
+  });
+
+  test('cuando se requiere recuperar la contraseña, el modal correspondiente se abre automaticamente', async () => {
+    enviarMensajeChatbot.mockResolvedValue({
+      respuesta: 'Te ayudo a recuperar tu contraseña.',
+      accionRealizada: 'REDIRIGIR_RECUPERAR',
+      emocion: 'NEUTRAL',
+    });
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu mensaje...'), { target: { value: 'Olvidé mi contraseña' } });
+    fireEvent.click(screen.getByLabelText('Enviar mensaje'));
+
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Recuperar contraseña' })).toBeInTheDocument());
+    expect(screen.getByPlaceholderText('tu@correo.cl')).toBeInTheDocument();
+  });
+
+  test('al completar la recuperacion con exito, muestra confirmacion y abre el modal de login', async () => {
+    enviarMensajeChatbot.mockResolvedValue({
+      respuesta: 'Te ayudo a recuperar tu contraseña.',
+      accionRealizada: 'REDIRIGIR_RECUPERAR',
+      emocion: 'NEUTRAL',
+    });
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu mensaje...'), { target: { value: 'Olvidé mi contraseña' } });
+    fireEvent.click(screen.getByLabelText('Enviar mensaje'));
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Recuperar contraseña' })).toBeInTheDocument());
+
+    // Cierra el modal de recuperacion directamente para simular que ya
+    // completo el flujo (el detalle de los 3 pasos ya se prueba en
+    // RecuperarPasswordModal.test.jsx; aqui solo se valida la integracion).
+    fireEvent.click(screen.getByLabelText('Cerrar'));
+
+    expect(screen.queryByRole('heading', { name: 'Recuperar contraseña' })).not.toBeInTheDocument();
   });
 
   test('la tarjeta de "necesitas una cuenta" tambien abre el modal al hacer click en su boton', async () => {

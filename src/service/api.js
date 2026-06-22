@@ -19,6 +19,15 @@ axios.interceptors.response.use(
 export const login = (mail, pass) =>
   axios.post(`${GW}/usuarios/login`, { mail, pass }).then(r => r.data);
 
+export const solicitarCodigoRecuperacion = (mail) =>
+  axios.post(`${GW}/usuarios/recuperacion/solicitar`, { mail }).then(r => r.data);
+
+export const validarCodigoRecuperacion = (mail, codigo) =>
+  axios.post(`${GW}/usuarios/recuperacion/validar`, { mail, codigo }).then(r => r.data);
+
+export const cambiarPasswordConCodigo = (mail, codigo, nuevaPassword) =>
+  axios.post(`${GW}/usuarios/recuperacion/cambiar`, { mail, codigo, nuevaPassword }).then(r => r.data);
+
 // ─── USUARIOS ─────────────────────────────────────────────────────────────────
 export const registrarUsuario = (datos) =>
   axios.post(`${GW}/usuarios`, datos).then(r => r.data);

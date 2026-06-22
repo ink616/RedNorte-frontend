@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { enviarMensajeChatbot, obtenerHistorialChatbot, borrarHistorialChatbot } from '../service/api';
 import ChatbotAccionModal from './ChatbotAccionModal';
+import RecuperarPasswordModal from './RecuperarPasswordModal';
 
 /* ── Utilidades ─────────────────────────────────────────────── */
 
@@ -150,6 +151,8 @@ export default function ChatbotWidget() {
         setModalAccion('REGISTRO');
       } else if (respuesta.accionRealizada === 'REDIRIGIR_LOGIN') {
         setModalAccion('LOGIN');
+      } else if (respuesta.accionRealizada === 'REDIRIGIR_RECUPERAR') {
+        setModalAccion('RECUPERAR');
       }
     } catch {
       setMensajes(prev => [...prev, {
@@ -174,6 +177,7 @@ export default function ChatbotWidget() {
 
   const irARegistro = () => setModalAccion('REGISTRO');
   const irALogin = () => setModalAccion('LOGIN');
+  const irARecuperar = () => setModalAccion('RECUPERAR');
   const irAMisConsultas = () => { navigate('/mis-consultas'); setAbierto(false); };
 
   /* ── Borrar el historial de la conversacion actual ───────────── */
@@ -193,18 +197,25 @@ export default function ChatbotWidget() {
     }
   };
 
-  /* ── Maneja el cierre exitoso del modal de registro/login ──── */
+  /* ── Maneja el cierre exitoso de los modales (registro/login/recuperar) ── */
   const manejarExitoModal = useCallback(({ tipo }) => {
     setModalAccion(null);
-    const mensajeConfirmacion = tipo === 'REGISTRO'
-      ? '✅ ¡Tu cuenta fue creada con éxito! Ya puedes seguir contándome qué necesitas, por ejemplo, agendar tu cita.'
-      : '✅ ¡Sesión iniciada correctamente! Sigamos donde quedamos.';
+    const mensajesPorTipo = {
+      REGISTRO: '✅ ¡Tu cuenta fue creada con éxito! Ya puedes seguir contándome qué necesitas, por ejemplo, agendar tu cita.',
+      LOGIN: '✅ ¡Sesión iniciada correctamente! Sigamos donde quedamos.',
+      RECUPERAR: '🔐 ¡Tu contraseña fue actualizada con éxito! Ya puedes iniciar sesión con tu nueva contraseña.',
+    };
     setMensajes(prev => [...prev, {
       rol: 'assistant',
-      contenido: mensajeConfirmacion,
+      contenido: mensajesPorTipo[tipo] || 'Listo, seguimos.',
       fechaHora: new Date().toISOString(),
     }]);
     setEmocionActual('celebracion');
+    // Tras recuperar la contraseña, el flujo natural es pedirle que
+    // inicie sesion con la nueva clave (no se loguea automaticamente).
+    if (tipo === 'RECUPERAR') {
+      setTimeout(() => setModalAccion('LOGIN'), 900);
+    }
   }, []);
 
   const avatarMostrado = enviando
@@ -241,6 +252,15 @@ export default function ChatbotWidget() {
           <div className="cb-accion-titulo">🔑 Inicia sesión</div>
           <div className="cb-accion-detalle">Te llevamos a la página de inicio de sesión.</div>
           <button className="cb-accion-btn" onClick={irALogin}>Iniciar sesión</button>
+        </div>
+      );
+    }
+    if (msg.accionRealizada === 'REDIRIGIR_RECUPERAR') {
+      return (
+        <div className="cb-accion-card cb-accion-card--info">
+          <div className="cb-accion-titulo">🔐 Recuperar contraseña</div>
+          <div className="cb-accion-detalle">Te enviaremos un código de verificación a tu correo.</div>
+          <button className="cb-accion-btn" onClick={irARecuperar}>Recuperar contraseña</button>
         </div>
       );
     }
@@ -375,7 +395,12 @@ export default function ChatbotWidget() {
           : contenidoVentana
       )}
 
-      {modalAccion && (
+      {modalAccion === 'RECUPERAR' ? (
+        <RecuperarPasswordModal
+          onCerrar={() => setModalAccion(null)}
+          onExito={manejarExitoModal}
+        />
+      ) : modalAccion && (
         <ChatbotAccionModal
           tipo={modalAccion}
           onCerrar={() => setModalAccion(null)}
