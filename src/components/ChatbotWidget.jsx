@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { enviarMensajeChatbot, obtenerHistorialChatbot, borrarHistorialChatbot } from '../service/api';
 import ChatbotAccionModal from './ChatbotAccionModal';
 import RecuperarPasswordModal from './RecuperarPasswordModal';
+import AgendarCitaModal from './AgendarCitaModal';
 
 /* ── Utilidades ─────────────────────────────────────────────── */
 
@@ -61,7 +62,7 @@ export default function ChatbotWidget() {
   const [inactivo, setInactivo] = useState(false);
   const [emocionActual, setEmocionActual] = useState('acogedor');
   const [hayMensajeNuevo, setHayMensajeNuevo] = useState(false);
-  const [modalAccion, setModalAccion] = useState(null); // null | 'REGISTRO' | 'LOGIN'
+  const [modalAccion, setModalAccion] = useState(null); // null | 'REGISTRO' | 'LOGIN' | 'RECUPERAR' | 'AGENDAR'
   const [confirmarBorrado, setConfirmarBorrado] = useState(false);
   const [borrando, setBorrando] = useState(false);
 
@@ -153,6 +154,8 @@ export default function ChatbotWidget() {
         setModalAccion('LOGIN');
       } else if (respuesta.accionRealizada === 'REDIRIGIR_RECUPERAR') {
         setModalAccion('RECUPERAR');
+      } else if (respuesta.accionRealizada === 'REDIRIGIR_AGENDAR') {
+        setModalAccion('AGENDAR');
       }
     } catch {
       setMensajes(prev => [...prev, {
@@ -178,7 +181,9 @@ export default function ChatbotWidget() {
   const irARegistro = () => setModalAccion('REGISTRO');
   const irALogin = () => setModalAccion('LOGIN');
   const irARecuperar = () => setModalAccion('RECUPERAR');
+  const irAAgendar = () => setModalAccion('AGENDAR');
   const irAMisConsultas = () => { navigate('/mis-consultas'); setAbierto(false); };
+  const irAMisConsultasDesdeModal = () => { setModalAccion(null); irAMisConsultas(); };
 
   /* ── Borrar el historial de la conversacion actual ───────────── */
   const handleBorrarHistorial = async () => {
@@ -216,6 +221,27 @@ export default function ChatbotWidget() {
     if (tipo === 'RECUPERAR') {
       setTimeout(() => setModalAccion('LOGIN'), 900);
     }
+  }, []);
+
+  /**
+   * A diferencia de manejarExitoModal, esta NO cierra el modal: lo abrio
+   * AgendarCitaModal apenas la cita quedo reservada con exito, mientras
+   * AgendarFlujo sigue mostrando su propia pantalla de confirmacion
+   * (con "Agendar otra" / "Ver mis consultas"). Aqui solo se anuncia la
+   * cita en la conversacion para que, cuando el paciente vuelva al chat,
+   * la encuentre ya confirmada ahi tambien.
+   */
+  const manejarExitoAgendar = useCallback((datos) => {
+    const detalle = datos?.fecha && datos?.hora
+      ? `para el ${datos.fecha} a las ${datos.hora}`
+      : '';
+    const conDoctor = datos?.doctor ? ` con ${datos.doctor}` : '';
+    setMensajes(prev => [...prev, {
+      rol: 'assistant',
+      contenido: `✅ ¡Tu cita${conDoctor} quedó agendada ${detalle}!`.replace(/\s+/g, ' ').trim(),
+      fechaHora: new Date().toISOString(),
+    }]);
+    setEmocionActual('celebracion');
   }, []);
 
   const avatarMostrado = enviando
@@ -261,6 +287,15 @@ export default function ChatbotWidget() {
           <div className="cb-accion-titulo">🔐 Recuperar contraseña</div>
           <div className="cb-accion-detalle">Te enviaremos un código de verificación a tu correo.</div>
           <button className="cb-accion-btn" onClick={irARecuperar}>Recuperar contraseña</button>
+        </div>
+      );
+    }
+    if (msg.accionRealizada === 'REDIRIGIR_AGENDAR') {
+      return (
+        <div className="cb-accion-card cb-accion-card--info">
+          <div className="cb-accion-titulo">📅 Agenda tu cita</div>
+          <div className="cb-accion-detalle">Elige fecha, horario y describe tus síntomas, todo en un solo paso.</div>
+          <button className="cb-accion-btn" onClick={irAAgendar}>Agendar cita</button>
         </div>
       );
     }
@@ -399,6 +434,12 @@ export default function ChatbotWidget() {
         <RecuperarPasswordModal
           onCerrar={() => setModalAccion(null)}
           onExito={manejarExitoModal}
+        />
+      ) : modalAccion === 'AGENDAR' ? (
+        <AgendarCitaModal
+          onCerrar={() => setModalAccion(null)}
+          onExito={manejarExitoAgendar}
+          onVerConsultas={irAMisConsultasDesdeModal}
         />
       ) : modalAccion && (
         <ChatbotAccionModal

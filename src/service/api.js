@@ -28,6 +28,15 @@ export const validarCodigoRecuperacion = (mail, codigo) =>
 export const cambiarPasswordConCodigo = (mail, codigo, nuevaPassword) =>
   axios.post(`${GW}/usuarios/recuperacion/cambiar`, { mail, codigo, nuevaPassword }).then(r => r.data);
 
+// El correo de confirmacion de cita se dispara solo despues de reservar el
+// bloque con exito (ver AgendarPage.jsx). Si el envio falla del lado del
+// backend, este metodo no relanza nada especial: la llamada simplemente no
+// debe bloquear ni revertir una cita que ya quedo agendada de verdad.
+export const enviarConfirmacionCita = (mail, nombrePaciente, especialidad, fecha, hora) =>
+  axios.post(`${GW}/usuarios/notificaciones/confirmacion-cita`, {
+    mail, nombrePaciente, especialidad, fecha, hora,
+  }).then(r => r.data);
+
 // ─── USUARIOS ─────────────────────────────────────────────────────────────────
 export const registrarUsuario = (datos) =>
   axios.post(`${GW}/usuarios`, datos).then(r => r.data);

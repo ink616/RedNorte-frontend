@@ -9,6 +9,7 @@ jest.mock('../service/api', () => ({
   reservarBloque: jest.fn(),
   crearConsulta: jest.fn(),
   listarEstablecimientos: jest.fn(),
+  enviarConfirmacionCita: jest.fn(),
 }));
 
 const mockNavigate = jest.fn();
@@ -18,7 +19,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 import {
-  listarBloquesDisponibles, reservarBloque, crearConsulta, listarEstablecimientos,
+  listarBloquesDisponibles, reservarBloque, crearConsulta, listarEstablecimientos, enviarConfirmacionCita,
 } from '../service/api';
 
 const usuarioMock = {
@@ -44,6 +45,7 @@ beforeEach(() => {
   localStorage.clear();
   localStorage.setItem('rednorte_usuario', JSON.stringify(usuarioMock));
   listarEstablecimientos.mockResolvedValue([{ id: 'EST-001', nombre: 'Hospital Regional del Norte' }]);
+  enviarConfirmacionCita.mockResolvedValue({ mensaje: 'ok' });
 });
 
 describe('AgendarPage', () => {
@@ -138,6 +140,9 @@ describe('AgendarPage', () => {
     })));
     await waitFor(() => expect(reservarBloque).toHaveBeenCalledWith(501, 'USR010', 999));
     await waitFor(() => expect(screen.getByText('¡Cita agendada con éxito!')).toBeInTheDocument());
+    await waitFor(() => expect(enviarConfirmacionCita).toHaveBeenCalledWith(
+      'juan.perez@correo.cl', 'Perez Castro', 'Cardiología', expect.any(String), '08:00',
+    ));
   });
 
   test('si falla crear la consulta, muestra error y no intenta reservar el bloque', async () => {

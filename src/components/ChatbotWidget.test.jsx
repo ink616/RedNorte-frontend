@@ -11,6 +11,13 @@ jest.mock('../service/api', () => ({
   login: jest.fn(),
   registrarUsuario: jest.fn(),
   solicitarCodigoRecuperacion: jest.fn(),
+  validarCodigoRecuperacion: jest.fn(),
+  cambiarPasswordConCodigo: jest.fn(),
+  listarBloquesDisponibles: jest.fn(),
+  reservarBloque: jest.fn(),
+  crearConsulta: jest.fn(),
+  listarEstablecimientos: jest.fn(),
+  enviarConfirmacionCita: jest.fn(),
 }));
 
 const mockNavigate = jest.fn();
@@ -19,7 +26,10 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
-import { enviarMensajeChatbot, obtenerHistorialChatbot, borrarHistorialChatbot } from '../service/api';
+import {
+  enviarMensajeChatbot, obtenerHistorialChatbot, borrarHistorialChatbot, listarEstablecimientos,
+  listarBloquesDisponibles, crearConsulta, reservarBloque, enviarConfirmacionCita,
+} from '../service/api';
 
 const renderWidget = () => render(
   <MemoryRouter>
@@ -33,6 +43,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   localStorage.clear();
   obtenerHistorialChatbot.mockResolvedValue([]);
+  listarEstablecimientos.mockResolvedValue([]);
 });
 
 describe('ChatbotWidget', () => {
@@ -314,5 +325,93 @@ describe('ChatbotWidget', () => {
     fireEvent.click(screen.getByText('Sí, borrar'));
 
     await waitFor(() => expect(screen.getByText('¡Hola! Soy SaludBot 👋')).toBeInTheDocument());
+  });
+
+  test('cuando se requiere agendar, el modal de agendamiento se abre automaticamente', async () => {
+    enviarMensajeChatbot.mockResolvedValue({
+      respuesta: 'Claro, abramos tu agenda.',
+      accionRealizada: 'REDIRIGIR_AGENDAR',
+      emocion: 'NEUTRAL',
+    });
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu mensaje...'), { target: { value: 'Quiero agendar una cita' } });
+    fireEvent.click(screen.getByLabelText('Enviar mensaje'));
+
+    await waitFor(() => expect(screen.getByText('¿Qué día te queda mejor?')).toBeInTheDocument());
+  });
+
+  test('la tarjeta de "agenda tu cita" tambien abre el modal al hacer click en su boton', async () => {
+    enviarMensajeChatbot.mockResolvedValue({
+      respuesta: 'Claro, abramos tu agenda.',
+      accionRealizada: 'REDIRIGIR_AGENDAR',
+      emocion: 'NEUTRAL',
+    });
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu mensaje...'), { target: { value: 'Quiero agendar una cita' } });
+    fireEvent.click(screen.getByLabelText('Enviar mensaje'));
+    await waitFor(() => expect(screen.getByText('📅 Agenda tu cita')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText('Cerrar'));
+    expect(screen.queryByText('¿Qué día te queda mejor?')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Agendar cita'));
+    expect(screen.getByText('¿Qué día te queda mejor?')).toBeInTheDocument();
+  });
+
+  test('el modal de agendamiento se cierra con el boton X sin agregar mensajes', async () => {
+    enviarMensajeChatbot.mockResolvedValue({
+      respuesta: 'Claro, abramos tu agenda.',
+      accionRealizada: 'REDIRIGIR_AGENDAR',
+      emocion: 'NEUTRAL',
+    });
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu mensaje...'), { target: { value: 'Quiero agendar una cita' } });
+    fireEvent.click(screen.getByLabelText('Enviar mensaje'));
+    await waitFor(() => expect(screen.getByText('¿Qué día te queda mejor?')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText('Cerrar'));
+
+    expect(screen.queryByText('¿Qué día te queda mejor?')).not.toBeInTheDocument();
+  });
+
+  test('al agendar una cita con exito desde el modal, anuncia la confirmacion en el chat sin cerrar el modal', async () => {
+    localStorage.setItem('rednorte_usuario', JSON.stringify({
+      id: 'USR010', mail: 'juan.perez@correo.cl', rol: { tag: 'PACIENTE' }, token: 'jwt.token',
+      persona: { apellido1: 'Perez', apellido2: 'Castro' },
+    }));
+    enviarMensajeChatbot.mockResolvedValue({
+      respuesta: 'Claro, abramos tu agenda.',
+      accionRealizada: 'REDIRIGIR_AGENDAR',
+      emocion: 'NEUTRAL',
+    });
+    listarEstablecimientos.mockResolvedValue([{ id: 'EST-001', nombre: 'Hospital Regional del Norte' }]);
+    listarBloquesDisponibles.mockResolvedValue([
+      { id: 501, doctorId: 'USR002', establecimientoId: 'EST-001', horaInicio: '08:00:00', horaFin: '08:30:00', estado: 'DISPONIBLE' },
+    ]);
+    crearConsulta.mockResolvedValue({ id: 999 });
+    reservarBloque.mockResolvedValue({});
+    enviarConfirmacionCita.mockResolvedValue({});
+
+    renderWidget();
+    fireEvent.click(screen.getByLabelText('Abrir chat con SaludBot'));
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu mensaje...'), { target: { value: 'Quiero agendar una cita' } });
+    fireEvent.click(screen.getByLabelText('Enviar mensaje'));
+    await waitFor(() => expect(screen.getByText('¿Qué día te queda mejor?')).toBeInTheDocument());
+
+    fireEvent.click(document.querySelectorAll('.ag-fecha-chip')[0]);
+    await waitFor(() => expect(screen.getByText('08:00')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('08:00'));
+    await waitFor(() => expect(screen.getByText('Confirma tu cita')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByPlaceholderText(/Describe detalladamente/), { target: { value: 'Control general' } });
+    fireEvent.click(screen.getByText('✅ Confirmar cita'));
+
+    await waitFor(() => expect(screen.getByText('¡Cita agendada con éxito!')).toBeInTheDocument());
+    // El modal sigue abierto (pantalla de exito de AgendarFlujo) y,
+    // ademas, la confirmacion ya quedo anunciada en el historial del chat.
+    await waitFor(() => expect(screen.getByText(/quedó agendada/)).toBeInTheDocument());
   });
 });

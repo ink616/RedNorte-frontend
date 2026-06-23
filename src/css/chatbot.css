@@ -264,6 +264,10 @@
 .cb-modal-card::-webkit-scrollbar { width: 6px; }
 .cb-modal-card::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 .cb-modal-card--registro { max-width: 460px; }
+.cb-modal-card--agendar { max-width: 640px; padding: 28px 24px 24px; }
+@media (max-width: 680px) {
+  .cb-modal-card--agendar { max-width: 100%; padding: 22px 16px 18px; }
+}
 @keyframes cbModalAparecer {
   0%   { opacity: 0; transform: translateY(24px) scale(0.92); }
   60%  { transform: translateY(-4px) scale(1.01); }
